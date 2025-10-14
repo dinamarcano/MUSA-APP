@@ -13,8 +13,8 @@ const MainPage: React.FC = () => {
 
       {/* Contenido principal */}
       <main className="flex flex-1">
-        {/* Sidebar */}
-        <aside className="w-64 bg-white border-r hidden md:block">
+        {/* Sidebar DELGADA - Cambiado w-64 por w-16 */}
+        <aside className="w-16 bg-white border-r hidden md:block">
           <Sidebar />
         </aside>
 

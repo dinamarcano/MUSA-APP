@@ -2,11 +2,14 @@ import React from 'react';
 
 const Sidebar: React.FC = () => {
   return (
-    <aside className="hidden md:flex flex-col bg-white shadow-md w-16 p-4 space-y-4">
-      <img src="/assets/Icons/home.svg" alt="Home" className="w-6 h-6 mx-auto" />
-      <img src="/assets/Icons/bell.svg" alt="Bell" className="w-6 h-6 mx-auto" />
-      <img src="/assets/Icons/user.svg" alt="User" className="w-6 h-6 mx-auto" />
-    </aside>
+    <div className="w-16 bg-white border-r border-gray-200 text-gray-700 min-h-screen flex flex-col items-center py-4">
+      {/* Iconos */}
+      <div className="space-y-4">
+        <button className="p-2 hover:bg-gray-100 rounded">🏠</button>
+        <button className="p-2 hover:bg-gray-100 rounded">🔍</button>
+        <button className="p-2 hover:bg-gray-100 rounded">📧</button>
+      </div>
+    </div>
   );
 };
 
