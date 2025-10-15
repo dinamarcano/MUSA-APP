@@ -1,35 +1,33 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from "react";
+import Navbar from "./components/Navbar";
+import Board from "./components/Board";
+import Profile from "./components/Profile";
+import Preferences from "./components/Preferences";
+import Sidebar from "./components/Sidebar";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  // Actualiza el tipo para que coincida con Navbar
+  const [page, setPage] = useState<"boards" | "profile" | "preferences" | "bookmarks">("boards");
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Sidebar fijo */}
+      <Sidebar />
 
-export default App
+      {/* Contenedor principal */}
+      <div className="flex-1 flex flex-col">
+        {/* Navbar con control de página */}
+        <Navbar setPage={setPage} />
+
+        {/* Contenido dinámico */}
+        <main className="flex-1 p-6 overflow-y-auto">
+          {page === "boards" && <Board />}
+          {page === "profile" && <Profile />}
+          {page === "preferences" && <Preferences />}
+          {/* Agrega el caso para bookmarks si necesitas */}
+          {page === "bookmarks" && <div>Bookmarks Page</div>}
+        </main>
+      </div>
+    </div>
+  );
+}
