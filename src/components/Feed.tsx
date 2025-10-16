@@ -5,14 +5,13 @@ import {
   HiShare,
   HiUpload,
   HiLightBulb,
+  HiX,
 } from "react-icons/hi";
 
 const Feed: React.FC = () => {
-  const [newPost, setNewPost] = useState({
-    image: "",
-    description: "",
-  });
+  const [newPost, setNewPost] = useState({ image: "", description: "" });
   const [preview, setPreview] = useState<string | null>(null);
+  const [selectedPost, setSelectedPost] = useState<any | null>(null);
   const [posts, setPosts] = useState([
     {
       id: 1,
@@ -71,7 +70,7 @@ const Feed: React.FC = () => {
     setPreview(null);
   };
 
-  // 💡 Recomendaciones de publicaciones automáticas
+  // 💡 Recomendaciones automáticas
   const recommendedPosts = useMemo(() => {
     if (!posts.length) return [];
 
@@ -129,33 +128,6 @@ const Feed: React.FC = () => {
           image:
             "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=900&q=60",
           description: "Fotografía de retrato en blanco y negro 🖤",
-        },
-      ];
-    } else if (lastDesc.includes("naturaleza") || lastDesc.includes("paisaje")) {
-      return [
-        {
-          id: 301,
-          author: "Sofía Campos",
-          username: "@sofiart",
-          image:
-            "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=60",
-          description: "Paisajes que respiran tranquilidad 🍃",
-        },
-        {
-          id: 302,
-          author: "Tomás Rivera",
-          username: "@tomi_rv",
-          image:
-            "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=900&q=60",
-          description: "Montañas y cielos que inspiran libertad 🌄",
-        },
-        {
-          id: 303,
-          author: "Marta Valdés",
-          username: "@valdesm",
-          image:
-            "https://images.unsplash.com/photo-1526481280690-0aaadf8ec2c8?auto=format&fit=crop&w=900&q=60",
-          description: "Tonos verdes y bruma matutina 🌿",
         },
       ];
     } else {
@@ -231,11 +203,12 @@ const Feed: React.FC = () => {
         </button>
       </div>
 
-      {/* 🔵 Feed principal */}
+      {/* 🔵 Publicaciones con vista previa */}
       {posts.map((post) => (
         <div
           key={post.id}
-          className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition"
+          onClick={() => setSelectedPost(post)}
+          className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition cursor-pointer"
         >
           <div className="flex items-center gap-3 p-4">
             <img
@@ -279,7 +252,7 @@ const Feed: React.FC = () => {
         </div>
       ))}
 
-      {/* 💡 Más ideas (sugerencias visuales) */}
+      {/* 💡 Más ideas (también con vista previa) */}
       <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
         <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
           <HiLightBulb className="text-yellow-500" /> Más ideas para ti
@@ -289,7 +262,8 @@ const Feed: React.FC = () => {
           {recommendedPosts.map((idea) => (
             <div
               key={idea.id}
-              className="rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition bg-white"
+              onClick={() => setSelectedPost(idea)}
+              className="cursor-pointer rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition bg-white"
             >
               <img
                 src={idea.image}
@@ -307,6 +281,56 @@ const Feed: React.FC = () => {
           ))}
         </div>
       </div>
+
+      {/* 🪟 Modal de vista ampliada (para todo tipo de publicación) */}
+      {selectedPost && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50"
+          onClick={() => setSelectedPost(null)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-lg max-w-lg w-full overflow-hidden relative animate-fadeIn"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setSelectedPost(null)}
+              className="absolute top-3 right-3 text-gray-600 hover:text-black transition"
+            >
+              <HiX className="w-6 h-6" />
+            </button>
+
+            <img
+              src={selectedPost.image}
+              alt={selectedPost.description}
+              className="w-full h-80 object-cover"
+            />
+
+            <div className="p-5">
+              <h2 className="text-lg font-semibold text-gray-900">
+                {selectedPost.author}
+              </h2>
+              <p className="text-sm text-gray-500 mb-3">
+                {selectedPost.username}
+              </p>
+              <p className="text-gray-700 text-sm mb-4">
+                {selectedPost.description}
+              </p>
+
+              <div className="flex gap-5 text-gray-600 text-sm">
+                <button className="flex items-center gap-1 hover:text-red-500 transition">
+                  <HiHeart className="w-5 h-5" /> Me gusta
+                </button>
+                <button className="flex items-center gap-1 hover:text-blue-500 transition">
+                  <HiChat className="w-5 h-5" /> Comentar
+                </button>
+                <button className="flex items-center gap-1 hover:text-green-500 transition">
+                  <HiShare className="w-5 h-5" /> Compartir
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
