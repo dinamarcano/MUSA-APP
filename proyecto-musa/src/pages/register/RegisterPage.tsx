@@ -1,17 +1,18 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
+import ImageMosaic from '../../components/ImageMosaic';
 import logo from "../../assets/logo/LOGO (2).png";
-import img1 from "../../assets/imagenes/image 1.png"; 
-import img2 from "../../assets/imagenes/image 2.png";
-import img3 from "../../assets/imagenes/image 3.png";
-import img4 from "../../assets/imagenes/image 4.png";
-import img5 from "../../assets/imagenes/image 5.png";
-import img6 from "../../assets/imagenes/image 6.png";
-import img7 from "../../assets/imagenes/image 7.png"; 
+import img1 from '../../assets/imagenes/image 1.png'; 
+import img2 from '../../assets/imagenes/image 2.png';
+import img3 from '../../assets/imagenes/image 3.png';
+import img4 from '../../assets/imagenes/image 4.png';
+import img5 from '../../assets/imagenes/image 5.png';
+import img6 from '../../assets/imagenes/image 6.png';
+import img7 from '../../assets/imagenes/image 7.png'; 
+
 
 const RegisterPage = () => {
   const navigate = useNavigate();
-  const imageClasses = "w-full h-full object-cover transition duration-300 hover:scale-105";
 
   const IconUser = () => (
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-gray-700">
@@ -42,6 +43,10 @@ const RegisterPage = () => {
     navigate(-1);
   };
 
+  const handleContinue = () => {
+    navigate("/preferences");
+  };
+
   return (
     <div className="min-h-screen bg-white md:flex relative">
       
@@ -56,52 +61,25 @@ const RegisterPage = () => {
         </button>
       </div>
       
-    <div className="hidden md:block md:w-1/2 p-4 md:p-8 bg-white overflow-hidden relative h-screen">
-        
-  
-        
-        <div className="grid grid-cols-4 grid-rows-4 gap-3 h-[calc(100vh-100px)]">
-          <div className="col-span-2 row-span-2 rounded-xl overflow-hidden shadow-xl">
-            <img src={img1} alt="Obra de arte Van Gogh" className={imageClasses} />
-          </div>
-          <div className="col-span-1 row-span-2 rounded-xl overflow-hidden shadow-xl">
-            <img src={img3} alt="Retrato artístico" className={imageClasses} />
-          </div>
-          <div className="col-span-1 row-span-4 rounded-xl overflow-hidden shadow-xl">
-            <img src={img2} alt="Mano tocando piano" className={imageClasses} />
-          </div>
-          <div className="col-span-1 row-span-2 rounded-xl overflow-hidden shadow-xl">
-            <img src={img4} alt="Faroles urbanos" className={imageClasses} />
-          </div>
-          <div className="col-span-1 row-span-2 rounded-xl overflow-hidden shadow-xl">
-            <img src={img5} alt="Mujer con flores" className={imageClasses} />
-          </div>
-          <div className="col-span-1 row-span-1 rounded-xl overflow-hidden shadow-xl">
-            <img src={img6} alt="Pintor en la costa" className={imageClasses} />
-          </div>
-          <div className="col-span-1 row-span-1 rounded-xl overflow-hidden shadow-xl">
-            <img src={img7} alt="Muelle al atardecer" className={imageClasses} />
-          </div>
-        </div>
-      </div>
+      <ImageMosaic showTitle={true} />
 
-      <div className="w-full md:w-1/2 flex items-center justify-center p-4 md:p-12 overflow-y-auto">
+      <div className="w-full md:w-1/2 flex items-center justify-center p-4 md:p-8 overflow-y-auto h-screen">
         
-       <div className="w-full max-w-full md:max-w-md bg-white rounded-none md:rounded-3xl p-0 md:p-8 md:shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="w-full max-w-full md:max-w-md bg-white rounded-none md:rounded-3xl p-0 md:p-8 md:shadow-2xl max-h-[90vh] overflow-y-auto">
           
-          <div className="flex flex-col items-center pt-8 px-4 md:pt-0 text-center">
+          <div className="flex flex-col items-center pt-6 px-4 md:pt-0 text-center">
              
              <img 
                src={logo} 
                alt="Musa" 
-               className="w-16 h-16 object-contain mb-6 mt-8 md:mb-8 md:mt-0" 
+               className="w-14 h-14 object-contain mb-4 mt-6 md:mb-6 md:mt-0" 
              />
              
-             <h1 className="text-3xl font-bold text-gray-800 text-center">Te damos la bienvenida a Musa</h1>
-             <p className="text-gray-600 text-base mt-2 mb-8 text-center">El arte se vive mejor en comunidad</p>
+             <h1 className="text-2xl font-bold text-gray-800 text-center">Te damos la bienvenida a Musa</h1>
+             <p className="text-gray-600 text-sm mt-2 mb-6 text-center">El arte se vive mejor en comunidad</p>
           </div>
 
-          <form className="flex flex-col gap-4 px-4 pb-8 md:pb-0">
+          <form className="flex flex-col gap-3 px-4 pb-6 md:pb-0">
             
             <div className={`relative flex items-center ${inputBgColor} rounded-xl px-4 py-3`}>
               <span className="absolute left-4 top-1/2 transform -translate-y-1/2">
@@ -143,13 +121,14 @@ const RegisterPage = () => {
             </div>
             
             <button 
-              type="submit" 
-              className={`w-full ${buttonBgColor} text-white py-4 rounded-xl mt-8 font-semibold hover:bg-red-900 transition duration-150 shadow-lg cursor-pointer`}
+              type="button" 
+              onClick={handleContinue}
+              className={`w-full ${buttonBgColor} text-white py-3 rounded-xl mt-4 font-semibold hover:bg-red-900 transition duration-150 shadow-lg cursor-pointer`}
             >
               Continuar
             </button>
 
-            <div className="text-center mt-6">
+            <div className="text-center mt-4">
               <span className="text-gray-600 text-sm">¿Ya tienes una cuenta? </span>
               <button 
                 type="button" 

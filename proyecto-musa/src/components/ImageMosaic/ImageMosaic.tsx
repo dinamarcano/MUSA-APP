@@ -15,12 +15,11 @@ const ImageMosaic: React.FC<ImageMosaicProps> = ({ showTitle = true }) => {
   const imageClasses = "w-full h-full object-cover transition duration-300 hover:scale-105";
 
   return (
-    <div className="hidden md:block md:w-1/2 p-4 md:p-8 bg-gray-900 overflow-hidden relative h-screen">
+    <div className="hidden md:block md:w-1/2 p-4 md:p-8 bg-white overflow-hidden relative h-screen">
       
       {showTitle && (
         <div className="mb-4 text-white">
-          <h2 className="text-3xl font-serif">Musa App.</h2>
-          <p className="text-gray-400 text-sm">El arte se vive mejor en comunidad.</p>
+     
         </div>
       )}
       
