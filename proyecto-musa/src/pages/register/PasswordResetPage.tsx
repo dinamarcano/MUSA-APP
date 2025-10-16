@@ -9,7 +9,7 @@ import img5 from "../../assets/imagenes/image 5.png";
 import img6 from "../../assets/imagenes/image 6.png";
 import img7 from "../../assets/imagenes/image 7.png"; 
 
-const LoginPage = () => {
+const PasswordResetPage = () => {
   const navigate = useNavigate();
   const imageClasses = "w-full h-full object-cover transition duration-300 hover:scale-105";
 
@@ -19,30 +19,27 @@ const LoginPage = () => {
       </svg>
   );
 
-  const IconLock = () => (
+  const IconEmail = () => (
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-gray-700">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-3.75 0h18a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 10.5z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
       </svg>
   );
 
   const inputBgColor = "bg-[#f0f0f0]"; 
   const buttonBgColor = "bg-[#8D1E3A]";
 
-  const handleRegisterClick = () => {
-    navigate("/register");
-  };
-
-  const handleResetPasswordClick = () => {
-    navigate("/reset-password");
-  };
-
   const handleGoBack = () => {
     navigate(-1);
+  };
+
+  const handleLoginClick = () => {
+    navigate("/login");
   };
 
   return (
     <div className="min-h-screen bg-white md:flex relative">
       
+      {/* BOTÓN DE ATRÁS */}
       <div className="absolute top-0 left-0 pt-4 pl-4 md:hidden z-10"> 
         <button 
           onClick={handleGoBack}
@@ -54,9 +51,11 @@ const LoginPage = () => {
         </button>
       </div>
       
+      {/* PARTE IZQUIERDA: MOSAICO (SOLO DESKTOP) */}
       <div className="hidden md:block md:w-1/2 p-4 md:p-8 bg-white overflow-hidden relative h-screen">
         
- 
+
+        
         <div className="grid grid-cols-4 grid-rows-4 gap-3 h-[calc(100vh-100px)]"> 
           <div className="col-span-2 row-span-2 rounded-xl overflow-hidden shadow-xl">
             <img src={img1} alt="Obra de arte Van Gogh" className={imageClasses} />
@@ -82,6 +81,7 @@ const LoginPage = () => {
         </div>
       </div>
 
+      {/* PARTE DERECHA: FORMULARIO DE RESTABLECER CONTRASEÑA */}
       <div className="w-full md:w-1/2 flex items-center justify-center p-4 md:p-8 overflow-y-auto h-screen">
         
         <div className="w-full max-w-full md:max-w-md bg-white rounded-none md:rounded-3xl p-0 md:p-8 md:shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -94,15 +94,19 @@ const LoginPage = () => {
                className="w-14 h-14 object-contain mb-4 mt-6 md:mb-6 md:mt-0" 
              />
              
-             <h1 className="text-2xl font-bold text-gray-800 text-center">Te damos la bienvenida a Musa</h1>
-             <p className="text-gray-600 text-sm mt-2 mb-6 text-center">El arte se vive mejor en comunidad</p>
+             {/* TÍTULO ESPECÍFICO PARA RESTABLECER CONTRASEÑA */}
+             <h1 className="text-2xl font-bold text-gray-800 text-center">Restablecer contraseña</h1>
+             <p className="text-gray-600 text-sm mt-2 mb-6 text-center">
+               Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña
+             </p>
           </div>
 
-          <form className="flex flex-col gap-3 px-4 pb-6 md:pb-0">
+          <form className="flex flex-col gap-4 px-4 pb-6 md:pb-0">
             
+            {/* Campo Correo Electrónico */}
             <div className={`relative flex items-center ${inputBgColor} rounded-xl px-4 py-3`}>
               <span className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                <IconUser />
+                <IconEmail />
               </span>
               <input 
                 type="email" 
@@ -110,45 +114,24 @@ const LoginPage = () => {
                 className="w-full border-0 bg-transparent focus:ring-0 focus:outline-none placeholder-gray-700 text-gray-800 font-medium pl-10"
               />
             </div>
-
-            <div className="relative flex flex-col gap-1">
-                <div className={`relative flex items-center ${inputBgColor} rounded-xl px-4 py-3`}>
-                    <span className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                      <IconLock />
-                    </span>
-                    <input 
-                        type="password" 
-                        placeholder="Contraseña" 
-                        className="w-full border-0 bg-transparent focus:ring-0 focus:outline-none placeholder-gray-700 text-gray-800 font-medium pl-10"
-                    />
-                </div>
-                
-                <div className="text-right pt-1">
-                  <button 
-                    type="button" 
-                    onClick={handleResetPasswordClick}
-                    className="text-gray-400 text-sm hover:text-gray-600 transition duration-150"
-                  >
-                    ¿Olvidaste tu contraseña?
-                  </button>
-                </div>
-            </div>
             
+            {/* BOTÓN ENVIAR ENLACE */}
             <button 
               type="submit" 
               className={`w-full ${buttonBgColor} text-white py-3 rounded-xl mt-4 font-semibold hover:bg-red-900 transition duration-150 shadow-lg cursor-pointer`}
             >
-              Iniciar sesión
+              Enviar enlace
             </button>
 
+            {/* VOLVER AL INICIO DE SESIÓN */}
             <div className="text-center mt-4">
-              <span className="text-gray-600 text-sm">¿No tienes una cuenta? </span>
+              <span className="text-gray-600 text-sm">¿Recordaste tu contraseña? </span>
               <button 
                 type="button" 
-                onClick={handleRegisterClick}
+                onClick={handleLoginClick}
                 className="text-gray-800 font-semibold text-sm hover:text-gray-600 transition duration-150"
               >
-                Regístrate
+                Inicia sesión
               </button>
             </div>
           </form>
@@ -159,4 +142,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default PasswordResetPage;

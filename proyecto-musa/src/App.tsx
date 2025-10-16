@@ -2,18 +2,15 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import RegisterPage from "./pages/register/RegisterPage";
 import LoginPage from "./pages/register/LoginPage";
+import PasswordResetPage from "./pages/register/PasswordResetPage";  // ✅ Nueva importación
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Ruta para el login */}
         <Route path="/login" element={<LoginPage />} />
-        
-        {/* Ruta para el registro */}
         <Route path="/register" element={<RegisterPage />} />
-        
-        {/* Ruta por defecto - redirige al login */}
+        <Route path="/reset-password" element={<PasswordResetPage />} />  {/* ✅ Nueva ruta */}
         <Route path="/" element={<LoginPage />} />
       </Routes>
     </Router>
