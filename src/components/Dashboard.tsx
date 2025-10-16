@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import Boards from './Boards';
-import Bookmarks from './Bookmarks';
+import Bookmarks from './Bookmarks'; // Asegúrate de importar Bookmarks
 import Preferences from './Preferences';
 
 const Dashboard: React.FC = () => {
@@ -14,7 +14,6 @@ const Dashboard: React.FC = () => {
 
       <div className="flex-1 flex flex-col">
         <Navbar setPage={setActiveTab} />
-
 
         {/* Tabs de navegación */}
         <div className="flex space-x-4 px-6 py-3 border-b bg-white">
@@ -44,10 +43,10 @@ const Dashboard: React.FC = () => {
           </button>
         </div>
 
-        {/* Contenido dinámico */}
+        {/* Contenido dinámico - AQUÍ ESTÁ EL CAMBIO */}
         <div className="flex-1 overflow-y-auto p-6">
           {activeTab === 'boards' && <Boards />}
-          {activeTab === 'bookmarks' && <Bookmarks />}
+          {activeTab === 'bookmarks' && <Bookmarks />} {/* Cambia esto */}
           {activeTab === 'preferences' && <Preferences />}
         </div>
       </div>

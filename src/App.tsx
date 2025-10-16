@@ -26,7 +26,7 @@ export default function App() {
           {page === "profile" && <Profile />}
           {page === "preferences" && <Preferences />}
           {/* Agrega el caso para bookmarks si necesitas */}
-          {page === "bookmarks" && <div>Bookmarks Page</div>}
+          {page === "bookmarks" && <Bookmarks/>}
         </main>
       </div>
     </div>
