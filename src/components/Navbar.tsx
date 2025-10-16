@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-// Actualiza la interfaz para que coincida con Dashboard
 interface NavbarProps {
-  setPage: (page: 'boards' | 'bookmarks' | 'preferences') => void;
+  setPage: (page: 'board' | 'bookmarks' | 'preferences') => void;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ setPage }) => {
@@ -39,13 +38,12 @@ const Navbar: React.FC<NavbarProps> = ({ setPage }) => {
     <nav className="flex items-center justify-between bg-white p-4 shadow-sm border-b border-gray-200">
       {/* Logo y navegación */}
       <div className="flex items-center space-x-6">
-        <div className="text-xl font-bold text-gray-900 cursor-pointer" onClick={() => setPage('boards')}>
+        <div className="text-xl font-bold text-gray-900 cursor-pointer" onClick={() => setPage('board')}>
           MUSA
         </div>
 
         <div className="hidden md:flex space-x-4 text-sm font-medium text-gray-700">
-          {/* Estos botones ahora deben coincidir con los tipos actualizados */}
-          <button onClick={() => setPage('boards')} className="hover:text-blue-600">Tableros</button>
+          <button onClick={() => setPage('board')} className="hover:text-blue-600">Tableros</button>
           <button onClick={() => setPage('bookmarks')} className="hover:text-blue-600">Guardados</button>
           <button onClick={() => setPage('preferences')} className="hover:text-blue-600">Personalización</button>
         </div>
@@ -99,3 +97,4 @@ const Navbar: React.FC<NavbarProps> = ({ setPage }) => {
 };
 
 export default Navbar;
+

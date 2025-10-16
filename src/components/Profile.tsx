@@ -1,4 +1,3 @@
-import React from "react";
 
 const posts = [
   "https://upload.wikimedia.org/wikipedia/commons/3/3a/Abstract_painting_colorful.jpg",

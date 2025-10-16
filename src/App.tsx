@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Navbar from "./components/Navbar";
-import Board from "./components/Board";
+import Board from "./components/Boards";
 import Profile from "./components/Profile";
 import Preferences from "./components/Preferences";
 import Sidebar from "./components/Sidebar";
+import Bookmarks from "./components/Bookmarks";
 
 export default function App() {
   // Actualiza el tipo para que coincida con Navbar

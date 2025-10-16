@@ -1,10 +1,9 @@
-import React from "react";
 
 const artworks = [
-  "https://upload.wikimedia.org/wikipedia/commons/5/57/Vincent_van_Gogh_-_Caf%C3%A9_Terrace_at_Night.jpg",
-  "https://upload.wikimedia.org/wikipedia/commons/5/5f/Vincent_van_Gogh_-_Sunflowers_-_VGM_F458.jpg",
-  "https://upload.wikimedia.org/wikipedia/commons/0/0a/Starry_Night_Over_the_Rhone.jpg",
-  "https://upload.wikimedia.org/wikipedia/commons/6/6b/Pop_art_portrait.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/b/b4/Vincent_Willem_van_Gogh_128.jpg",
+  "https://i.pinimg.com/736x/95/5d/7b/955d7bc13fccbc8da479b178772a74f9.jpg",
+  "https://i.pinimg.com/736x/99/27/5b/99275b999fa4411b1c05b6657ac887d1.jpg",
+  "https://i.pinimg.com/1200x/ab/39/09/ab3909fbc7bdfe1edd352124948aaf1c.jpg",
 ];
 
 export default function Board() {

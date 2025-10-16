@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
-import Boards from './Board';
+import Boards from './Boards';
 import Bookmarks from './Bookmarks';
 import Preferences from './Preferences';
 
