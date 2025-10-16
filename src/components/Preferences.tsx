@@ -26,7 +26,7 @@ export default function Preferences() {
     <section className="flex flex-col items-center justify-center min-h-screen bg-white px-6 py-10">
       {/* Logo opcional arriba */}
       <div className="flex items-center justify-center mb-6">
-      <img src="/logo.png" alt="Logo" className="w-20 h-20" />
+      <img src="/assets/logo.png" alt="Logo" className="w-20 h-20" />
       
       </div>
 
