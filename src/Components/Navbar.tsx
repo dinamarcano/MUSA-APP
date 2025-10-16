@@ -43,7 +43,7 @@ const Navbar: React.FC = () => {
       {/* Logo */}
       <div className="text-xl font-bold text-gray-900">MUSA</div>
       
-      {/* Barra de búsqueda */}
+      {}
       <div ref={searchRef} className="relative w-1/2 max-w-md">
         <div className="relative">
           <input
@@ -55,12 +55,12 @@ const Navbar: React.FC = () => {
             className="w-full px-4 py-2 pl-10 pr-10 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
           />
           
-          {/* Icono de búsqueda */}
+          {}
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <HiSearch className="w-4 h-4 text-gray-500" />
           </div>
           
-          {/* Botón para limpiar búsqueda (solo aparece cuando hay texto) */}
+          {}
           {searchTerm && (
             <button
               onClick={clearSearch}
@@ -71,10 +71,10 @@ const Navbar: React.FC = () => {
           )}
         </div>
 
-        {/* Panel de búsquedas recientes */}
+        {}
         {isSearchOpen && (
           <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-xl mt-1 z-50 overflow-hidden">
-            {/* Header del panel */}
+            {}
             <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-gray-800 text-sm">BUSQUEDA</h3>
@@ -98,7 +98,7 @@ const Navbar: React.FC = () => {
                   <button
                     key={index}
                     onClick={() => handleSearch(search.term)}
-                    className="text-left p-3 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-all duration-200 border border-gray-100 hover:border-blue-200 hover:shadow-sm flex items-start"
+                    className="text-left p-3 text-sm text-gray-600 hover:bg-blue-50 hover:text-red-700 rounded-md transition-all duration-200 border border-gray-100 hover:border-red-200 hover:shadow-sm flex items-start"
                   >
                     <HiSearch className="w-3 h-3 mt-0.5 mr-2 text-gray-400 flex-shrink-0" />
                     <span>{search.term}</span>
@@ -110,10 +110,10 @@ const Navbar: React.FC = () => {
         )}
       </div>
 
-      {/* Usuario */}
+      {}
       <div className="flex items-center space-x-4">
-        {/* Indicador de temperatura */} 
-        {/* Avatar de usuario */}
+        {} 
+        {}
         <img 
           src="https://static.vecteezy.com/system/resources/previews/034/371/675/non_2x/person-silhouette-icon-user-icon-vector.jpg" 
           alt="User" 
