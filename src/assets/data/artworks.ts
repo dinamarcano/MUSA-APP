@@ -26,7 +26,7 @@ export const artworks: Artwork[] = [
   },
   {
     id: 4,
-    image: 'https://img.wikioo.org/ADC/art.nsf/get_large_image_wikioo?Open&ra=5ZKGLP',
+    image: 'https://uploads5.wikiart.org/images/vincent-van-gogh/self-portrait-with-bandaged-ear-1889.jpg!PinterestSmall.jpg',
     title: 'Woman with a Hat',
     artist: 'Pablo Picasso',
   },
@@ -50,7 +50,7 @@ export const artworks: Artwork[] = [
   },
   {
     id: 8,
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Van_Gogh_-_Gipsmodell_eines_knienden_Mannes.jpeg/250px-Van_Gogh_-_Gipsmodell_eines_knienden_Mannes.jpeg',
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4ZMz_mG2rt-NWCEeEki7uutqIi9YAK6CyNA&s',
     title: 'The Persistence of Memory',
     artist: 'Salvador Dalí',
   },
