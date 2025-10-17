@@ -8,8 +8,18 @@ import {
   HiSearch,
   HiSparkles,
 } from 'react-icons/hi';
+import { 
+  RiArtboardFill,
+  RiBookmarkFill,
+  RiSettings3Fill
+} from 'react-icons/ri';
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  setPage?: (page: 'boards' | 'bookmarks' | 'preferences') => void;
+  onGoToMain?: () => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState<number | null>(null);
 
@@ -38,6 +48,14 @@ const Sidebar: React.FC = () => {
       description: "podría inspirarte",
       type: "recommendation"
     }
+  ];
+
+  // MENÚ DE NAVEGACIÓN COMPLETO
+  const menuItems = [
+    { icon: HiHome, label: 'Inicio', action: () => onGoToMain?.() },
+    { icon: RiArtboardFill, label: 'Tableros', action: () => setPage?.('boards') },
+    { icon: RiBookmarkFill, label: 'Guardados', action: () => setPage?.('bookmarks') },
+    { icon: RiSettings3Fill, label: 'Preferencias', action: () => setPage?.('preferences') },
   ];
 
   const handleNotificationClick = (id: number) => {
@@ -79,14 +97,24 @@ const Sidebar: React.FC = () => {
       {/* Sidebar para desktop */}
       <div className="hidden md:flex w-16 bg-white border-r border-gray-200 text-gray-700 min-h-screen flex-col items-center py-4 relative">
         
-        {/* Iconos principales */}
+        {/* Iconos principales - MENÚ COMPLETO */}
         <div className="space-y-6">
-          <button 
-            className="p-3 hover:bg-blue-50 rounded-xl transition-all duration-200 text-gray-600 hover:text-blue-600"
-            title="Inicio"
-          >
-            <HiHome className="w-6 h-6" />
-          </button>
+          {menuItems.map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <button 
+                key={index}
+                className="p-3 hover:bg-blue-50 rounded-xl transition-all duration-200 text-gray-600 hover:text-blue-600"
+                title={item.label}
+                onClick={item.action}
+              >
+                <Icon className="w-6 h-6" />
+              </button>
+            );
+          })}
+          
+          {/* Separador */}
+          <div className="border-t border-gray-200 my-2"></div>
           
           {/* Botón de notificaciones */}
           <button 
@@ -104,6 +132,13 @@ const Sidebar: React.FC = () => {
             title="Mensajes"
           >
             <HiMail className="w-6 h-6" />
+          </button>
+
+          <button 
+            className="p-3 hover:bg-blue-50 rounded-xl transition-all duration-200 text-gray-600 hover:text-blue-600"
+            title="Perfil"
+          >
+            <HiUser className="w-6 h-6" />
           </button>
         </div>
 
@@ -186,42 +221,34 @@ const Sidebar: React.FC = () => {
         )}
       </div>
 
-      {/* Bottom Navigation Bar para móvil */}
+      {/* Bottom Navigation Bar para móvil - MENÚ COMPLETO */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 shadow-lg">
         <div className="flex justify-around items-center py-3">
-          <button 
-            className="flex flex-col items-center space-y-1 p-2 hover:bg-blue-50 rounded-xl transition-all duration-200 text-gray-600 hover:text-blue-600"
-            title="Inicio"
-          >
-            <HiHome className="w-6 h-6" />
-            <span className="text-xs">Inicio</span>
-          </button>
+          {menuItems.map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <button 
+                key={index}
+                className="flex flex-col items-center space-y-1 p-2 hover:bg-blue-50 rounded-xl transition-all duration-200 text-gray-600 hover:text-blue-600 min-w-0 flex-1"
+                title={item.label}
+                onClick={item.action}
+              >
+                <Icon className="w-5 h-5" />
+                <span className="text-xs truncate max-w-[60px]">{item.label}</span>
+              </button>
+            );
+          })}
           
+          {/* Botón de notificaciones móvil */}
           <button 
-            className="relative flex flex-col items-center space-y-1 p-2 hover:bg-blue-50 rounded-xl transition-all duration-200 text-gray-600 hover:text-blue-600"
+            className="relative flex flex-col items-center space-y-1 p-2 hover:bg-blue-50 rounded-xl transition-all duration-200 text-gray-600 hover:text-blue-600 min-w-0 flex-1"
             onClick={() => setShowNotifications(true)}
             title="Notificaciones"
           >
-            <HiBell className="w-6 h-6" />
+            <HiBell className="w-5 h-5" />
             <span className="text-xs">Notis</span>
             {/* Indicador de nuevas notificaciones */}
             <span className="absolute top-0 right-1 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
-          </button>
-          
-          <button 
-            className="flex flex-col items-center space-y-1 p-2 hover:bg-blue-50 rounded-xl transition-all duration-200 text-gray-600 hover:text-blue-600"
-            title="Mensajes"
-          >
-            <HiMail className="w-6 h-6" />
-            <span className="text-xs">Mensajes</span>
-          </button>
-
-          <button 
-            className="flex flex-col items-center space-y-1 p-2 hover:bg-blue-50 rounded-xl transition-all duration-200 text-gray-600 hover:text-blue-600"
-            title="Perfil"
-          >
-            <HiUser className="w-6 h-6" />
-            <span className="text-xs">Perfil</span>
           </button>
         </div>
       </div>
