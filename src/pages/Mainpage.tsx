@@ -1,6 +1,6 @@
 import React from "react";
 import Sidebar from "../Components/Sidebar";
-import Navbar from "../Components/Navbar";
+import Navbar from "../Components/Navbar_temp";
 import Gallery from "../Components/Gallery/Gallery";
 
 const MainPage: React.FC = () => {
