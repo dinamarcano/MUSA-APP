@@ -14,7 +14,7 @@ export default function Board() {
     <section className="max-w-7xl mx-auto">
       <h2 className="text-2xl font-bold mb-8">Mis obras favoritas</h2>
       
-      {/* Grid de imágenes más grandes */}
+      {}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {artworks.map((url, i) => (
           <div key={i} className="group relative">
@@ -23,7 +23,6 @@ export default function Board() {
               alt={`obra-${i}`}
               className="w-full h-100 object-cover rounded-2xl hover:scale-105 transition-transform duration-300 shadow-lg group-hover:shadow-xl"
             />
-            {/* Overlay con opciones en hover */}
             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100">
               <button className="bg-white text-gray-800 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors">
                 Ver detalles
@@ -32,7 +31,7 @@ export default function Board() {
           </div>
         ))}
         
-        {/* Botón de agregar - Centrado y más grande */}
+        {}
         <div className="flex flex-col items-center justify-center">
           <button
             onClick={() => setShowAddModal(true)}
@@ -48,7 +47,7 @@ export default function Board() {
         </div>
       </div>
 
-      {/* Modal para agregar nueva obra */}
+      {/*Agregar nueva obra */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-md">
@@ -86,7 +85,6 @@ export default function Board() {
                 </button>
                 <button
                   onClick={() => {
-                    // Aquí iría la lógica para agregar la obra
                     setShowAddModal(false);
                   }}
                   className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
@@ -99,7 +97,6 @@ export default function Board() {
         </div>
       )}
 
-      {/* Información adicional */}
       <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">
           Tu colección de obras

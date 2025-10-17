@@ -4,7 +4,7 @@ interface SavedItem {
   id: number;
   title: string;
   author: string;
-  image: string; // Cambiado a requerido
+  image: string;
   category: string;
   savedDate: string;
 }
@@ -100,7 +100,6 @@ const Bookmarks: React.FC = () => {
           </div>
         </div>
 
-        {/* Tabs de navegación del perfil */}
         <div className="border-b border-gray-200">
           <nav className="flex space-x-8">
             <button
@@ -171,18 +170,16 @@ const Bookmarks: React.FC = () => {
                   key={item.id} 
                   className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300 overflow-hidden group"
                 >
-                  {/* Imagen real */}
+                  {/* Imagen */}
                   <div className="h-48 bg-gray-100 overflow-hidden relative">
                     <img 
                       src={item.image} 
                       alt={item.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
-                        // Fallback si la imagen no carga
                         e.currentTarget.src = `https://via.placeholder.com/400x300/4F46E5/FFFFFF?text=${encodeURIComponent(item.category)}`;
                       }}
                     />
-                    {/* Overlay con botón de eliminar */}
                     <button 
                       className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-red-50 hover:text-red-600 transition-colors"
                       title="Eliminar de guardados"
@@ -245,7 +242,7 @@ const Bookmarks: React.FC = () => {
         </>
       )}
 
-      {/* Contenido de Publicaciones (placeholder) */}
+      {/* Contenido de Publicaciones */}
       {activeTab === 'publicaciones' && (
         <div className="text-center py-12">
           <div className="text-6xl mb-4">📝</div>

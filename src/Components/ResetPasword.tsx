@@ -9,10 +9,8 @@ const ResetPassword: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Aquí iría la lógica para restablecer la contraseña
     console.log('Restableciendo contraseña...');
     
-    // Después de restablecer, redirigir al login
     navigate('/login');
   };
 

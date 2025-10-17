@@ -44,7 +44,6 @@ const Navbar: React.FC<NavbarProps> = ({ onGoToMain }) => {
 
   return (
     <nav className="flex items-center justify-between bg-white p-4 shadow-sm border-b border-gray-200">
-      {/* Logo - Ahora con onGoToMain */}
       <div 
         className="text-xl font-bold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
         onClick={() => onGoToMain?.()}
@@ -64,12 +63,10 @@ const Navbar: React.FC<NavbarProps> = ({ onGoToMain }) => {
             className="w-full px-4 py-2 pl-10 pr-10 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
           />
           
-          {/* Icono de búsqueda */}
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <HiSearch className="w-4 h-4 text-gray-500" />
           </div>
           
-          {/* Botón para limpiar búsqueda */}
           {searchTerm && (
             <button
               onClick={clearSearch}
@@ -83,7 +80,6 @@ const Navbar: React.FC<NavbarProps> = ({ onGoToMain }) => {
         {/* Panel de búsqueda */}
         {isSearchOpen && (
           <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-xl mt-1 z-50 overflow-hidden">
-            {/* Header del panel de búsqueda */}
             <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-gray-800 text-sm">BUSQUEDA</h3>
@@ -121,7 +117,6 @@ const Navbar: React.FC<NavbarProps> = ({ onGoToMain }) => {
 
       {/* Usuario */}
       <div className="flex items-center space-x-4">
-        {/* Botones de acceso */}
         <button className="text-sm text-gray-700 hover:text-blue-600 transition-colors">
           Iniciar sesión
         </button>
@@ -129,7 +124,6 @@ const Navbar: React.FC<NavbarProps> = ({ onGoToMain }) => {
           Registrarse
         </button>
         
-        {/* Avatar de usuario */}
         <img 
           src="https://static.vecteezy.com/system/resources/previews/034/371/675/non_2x/person-silhouette-icon-user-icon-vector.jpg" 
           alt="User" 

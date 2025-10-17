@@ -97,7 +97,6 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
       {/* Sidebar para desktop */}
       <div className="hidden md:flex w-16 bg-white border-r border-gray-200 text-gray-700 min-h-screen flex-col items-center py-4 relative">
         
-        {/* Iconos principales - MENÚ COMPLETO */}
         <div className="space-y-6">
           {menuItems.map((item, index) => {
             const Icon = item.icon;
@@ -113,7 +112,6 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
             );
           })}
           
-          {/* Separador */}
           <div className="border-t border-gray-200 my-2"></div>
           
           {/* Botón de notificaciones */}
@@ -123,7 +121,6 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
             title="Notificaciones"
           >
             <HiBell className="w-6 h-6" />
-            {/* Indicador de nuevas notificaciones */}
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
           </button>
           
@@ -142,11 +139,11 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
           </button>
         </div>
 
-        {/* Panel de notificaciones - SOLO DESKTOP */}
+        {/* Panel de notificaciones */}
         {showNotifications && (
           <div className="fixed left-16 top-0 w-80 h-full bg-white border-l border-gray-200 shadow-xl z-50 overflow-hidden">
             
-            {/* Header del panel - FIJO */}
+            {/* Header del panel */}
             <div className="p-4 border-b border-gray-200 bg-white sticky top-0 z-10">
               <div className="flex items-center space-x-3">
                 <button 
@@ -161,11 +158,9 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
               </div>
             </div>
 
-            {/* Contenido del panel - CON SCROLL */}
             <div className="p-4 overflow-y-auto h-[calc(100vh-80px)]">
               
               {selectedNotification === null ? (
-                /* Vista de lista de notificaciones */
                 <>
                   <h3 className="font-semibold text-gray-700 mb-4 text-sm uppercase tracking-wide">Notificaciones</h3>
                   <div className="space-y-3">
@@ -186,7 +181,6 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
                   </div>
                 </>
               ) : (
-                /* Vista detalle de notificación */
                 <div className="space-y-6">
                   {(() => {
                     const details = getNotificationDetails(selectedNotification);
@@ -202,7 +196,6 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
                           {details.content}
                         </p>
                         
-                        {/* Botones de acción */}
                         <div className="flex space-x-3 pt-4">
                           <button className="flex-1 bg-blue-500 text-white py-3 px-4 rounded-xl text-sm hover:bg-blue-600 transition-colors font-medium">
                             Explorar
@@ -221,7 +214,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
         )}
       </div>
 
-      {/* Bottom Navigation Bar para móvil - MENÚ COMPLETO */}
+      {/* Bottom Navigation Bar para móvil */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 shadow-lg">
         <div className="flex justify-around items-center py-3">
           {menuItems.map((item, index) => {
@@ -247,17 +240,14 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
           >
             <HiBell className="w-5 h-5" />
             <span className="text-xs">Notis</span>
-            {/* Indicador de nuevas notificaciones */}
             <span className="absolute top-0 right-1 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
           </button>
         </div>
       </div>
 
-      {/* Modal de notificaciones para móvil */}
       {showNotifications && (
         <div className="md:hidden fixed inset-0 bg-white z-50 overflow-hidden">
           
-          {/* Header del modal */}
           <div className="p-4 border-b border-gray-200 bg-white sticky top-0 z-10">
             <div className="flex items-center space-x-3">
               <button 
@@ -272,11 +262,9 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
             </div>
           </div>
 
-          {/* Contenido del modal */}
           <div className="p-4 overflow-y-auto h-[calc(100vh-80px)]">
             
             {selectedNotification === null ? (
-              /* Vista de lista de notificaciones */
               <>
                 <h3 className="font-semibold text-gray-700 mb-4 text-sm uppercase tracking-wide">Notificaciones</h3>
                 <div className="space-y-3">
@@ -313,7 +301,6 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
                         {details.content}
                       </p>
                       
-                      {/* Botones de acción */}
                       <div className="flex space-x-3 pt-4">
                         <button className="flex-1 bg-blue-500 text-white py-3 px-4 rounded-xl text-sm hover:bg-blue-600 transition-colors font-medium">
                           Explorar

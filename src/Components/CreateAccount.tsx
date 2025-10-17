@@ -13,19 +13,15 @@ const CreateAccount: React.FC<CreateAccountProps> = ({ onContinue }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Aquí iría la lógica de creación de cuenta
     console.log('Creando cuenta...', { email, password, birthDate });
     
-    // Ejecutar el callback
     onContinue();
     
-    // Navegar a preferencias
     navigate('/preferencias');
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white-900 to-white-600 flex flex-col items-center justify-center p-4">
-      {/* Encabezado con texto artístico */}
       <div className="text-center mb-8 text-black">
         <h2 className="text-3xl md:text-4xl font-bold mb-2">Crea tu cuenta en</h2>
         <h2 className="text-3xl md:text-4xl font-bold mb-2">Musa</h2>

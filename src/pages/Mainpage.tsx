@@ -18,13 +18,11 @@ const MainPage: React.FC = () => {
           <Sidebar />
         </aside>
 
-        {/* Galería principal - con padding bottom para móvil */}
         <section className="flex-1 p-4 md:p-8 overflow-y-auto pb-20 md:pb-8">
           <Gallery />
         </section>
       </main>
 
-      {/* Sidebar móvil (se renderiza como bottom nav) */}
       <div className="md:hidden">
         <Sidebar />
       </div>

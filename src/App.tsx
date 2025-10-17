@@ -9,23 +9,20 @@ import Bookmarks from "./Components/Bookmarks";
 import PostDetail from "./pages/PostDetails";
 import './index.css'
 import Login from "./Components/Login";
-import ResetPassword from "./Components/Resetpasword";
+import ResetPassword from "./Components/ResetPasword";
 import React from "react";
 import Gallery from "./Components/Gallery/Gallery";
 import Preferencias from "./Components/Preferences";
 import CreateAccount from "./Components/CreateAccount";
 
-// Estado global simple para la página del dashboard
 let currentDashboardPage: "boards" | "profile" | "preferences" | "bookmarks" = "boards";
 
-// Estado de autenticación global
 let isAuthenticated = false;
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [dashboardPage, setDashboardPage] = useState<"boards" | "profile" | "preferences" | "bookmarks">(currentDashboardPage);
 
-  // Escuchar cambios desde MainPage
   React.useEffect(() => {
     const handleNavigation = (event: CustomEvent) => {
       setDashboardPage(event.detail);
@@ -99,12 +96,10 @@ const MainPageWrapper: React.FC = () => {
   );
 };
 
-// Componente de ruta protegida
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
-// Componente de ruta pública (solo para no autenticados)
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return !isAuthenticated ? <>{children}</> : <Navigate to="/" replace />;
 };
@@ -115,7 +110,7 @@ export default function App() {
   };
 
   const handleCreateAccount = () => {
-    // Lógica para crear cuenta (podría ser diferente de login)
+    // Lógica para crear cuenta
     console.log('Cuenta creada exitosamente');
   };
 
@@ -123,7 +118,6 @@ export default function App() {
     <Router>
       <div className="min-h-screen bg-gray-50 text-gray-900">
         <Routes>
-          {/* Rutas públicas (solo para no autenticados) */}
           <Route 
             path="/login" 
             element={
@@ -157,7 +151,6 @@ export default function App() {
             } 
           />
 
-          {/* Rutas protegidas (solo para autenticados) */}
           <Route 
             path="/" 
             element={
@@ -183,7 +176,6 @@ export default function App() {
             } 
           />
 
-          {/* Ruta por defecto */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </div>

@@ -43,15 +43,12 @@ const PostDetail: React.FC = () => {
           
           <div className="text-xl font-bold text-gray-900">MUSA</div>
           
-          <div className="w-6"></div> {/* Espacio para balancear */}
+          <div className="w-6"></div> 
         </div>
       </header>
 
-      {/* Contenido principal */}
       <main className="flex flex-1">
-        {/* Sidebar */}
         <aside className="w-16 bg-white border-r border-gray-200 hidden md:block">
-          {/* Tu componente Sidebar aquí */}
         </aside>
 
         {/* Contenido del post */}
@@ -115,14 +112,12 @@ const PostDetail: React.FC = () => {
                 </button>
               </div>
 
-              {/* Sección de comentarios (puedes expandir esto) */}
               <div className="mt-6">
                 <h3 className="font-semibold text-gray-800 mb-4">Comentarios</h3>
                 <div className="space-y-4">
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <p className="text-gray-600">¡Hermosa interpretación! Los colores son increíbles. 🎨</p>
                   </div>
-                  {/* Más comentarios aquí */}
                 </div>
               </div>
             </div>
@@ -132,7 +127,6 @@ const PostDetail: React.FC = () => {
 
       {/* Bottom Navigation para móvil */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40">
-        {/* Tu bottom navigation aquí */}
       </div>
     </div>
   );
