@@ -13,10 +13,26 @@ const CreateAccount: React.FC<CreateAccountProps> = ({ onContinue }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Creando cuenta...', { email, password, birthDate });
+    
+    // 1. Crear objeto con datos del usuario
+    const userData = {
+      email,
+      password,
+      birthDate,
+      createdAt: new Date().toISOString()
+    };
+
+    // 2. Guardar en LocalStorage (PERSISTENTE)
+    localStorage.setItem('userData', JSON.stringify(userData));
+    
+    // 3. Guardar también en una lista de usuarios
+    const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
+    const updatedUsers = [...existingUsers, userData];
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+
+    console.log('Cuenta creada y guardada en LOCAL STORAGE:', userData);
     
     onContinue();
-    
     navigate('/preferencias');
   };
 
