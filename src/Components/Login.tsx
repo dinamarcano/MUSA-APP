@@ -6,16 +6,34 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState(''); // Cambié username por email
   const [password, setPassword] = useState('');
+  const [error, setError] = useState(''); // Estado para mensajes de error
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Iniciando sesión...', { username, password });
+    setError(''); // Limpiar errores anteriores
+
+    // 1. Obtener usuarios guardados en LocalStorage
+    const storedUsers = JSON.parse(localStorage.getItem('users') || '[]');
     
-    onLogin();
-    navigate('/');
+    // 2. Buscar usuario que coincida con email y password
+    const user = storedUsers.find((user: any) => 
+      user.email === email && user.password === password
+    );
+
+    if (user) {
+      // 3. Login exitoso
+      console.log('Login exitoso:', user);
+      localStorage.setItem('currentUser', JSON.stringify(user)); // Guardar sesión
+      onLogin();
+      navigate('/');
+    } else {
+      // 4. Login fallido
+      setError('Email o contraseña incorrectos');
+      console.log('Login fallido');
+    }
   };
 
   return (
@@ -29,19 +47,26 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           El arte se vive mejor en comunidad
         </p>
 
+        {/* Mostrar error si existe */}
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+        )}
+
         {/* Formulario de login */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
-              Usuario
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              Correo electrónico
             </label>
             <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email" // Cambié a type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              placeholder="Ingresa tu usuario"
+              placeholder="Ingresa tu correo electrónico"
               required
             />
           </div>
@@ -63,7 +88,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
           <button
             type="submit"
-            className="w-full bg-red-800 text-white py-3 px-4 rounded-lg hover:bg-red-800 transition duration-200 font-medium text-base"
+            className="w-full bg-red-800 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition duration-200 font-medium text-base"
           >
             Iniciar sesión
           </button>
