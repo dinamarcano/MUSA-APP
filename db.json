@@ -1,0 +1,18 @@
+{
+  "users": [
+    {
+      "id": "7c6a",
+      "email": "q@1",
+      "password": "12",
+      "birthDate": "1212-02-12",
+      "createdAt": "2025-11-08T18:20:20.956Z"
+    },
+    {
+      "id": "4687",
+      "email": "juanito@chancla",
+      "password": "chancla",
+      "birthDate": "2004-02-12",
+      "createdAt": "2025-11-08T18:30:09.523Z"
+    }
+  ]
+}
