@@ -3,17 +3,26 @@ import type { Post } from "../types/posts";
 
 interface Props {
   post: Post;
-  onAddComment: (postId: number, text: string) => void;
+  onAddComment: (postId: number, text: string) => Promise<void>;
 }
 
 const Comments: React.FC<Props> = ({ post, onAddComment }) => {
   const [text, setText] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!text.trim()) return;
-    onAddComment(post.id, text.trim()); // 👈 llama la función que viene desde Boards
-    setText("");
+    if (!text.trim() || isSubmitting) return;
+    
+    setIsSubmitting(true);
+    try {
+      await onAddComment(post.id, text.trim());
+      setText("");
+    } catch (error) {
+      console.error("Error al agregar comentario:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -45,13 +54,15 @@ const Comments: React.FC<Props> = ({ post, onAddComment }) => {
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Escribe un comentario..."
-          className="flex-1 border rounded px-2 py-1 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+          disabled={isSubmitting}
+          className="flex-1 border rounded px-2 py-1 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50 disabled:cursor-not-allowed"
         />
         <button
           type="submit"
-          className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+          disabled={isSubmitting || !text.trim()}
+          className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Enviar
+          {isSubmitting ? "Enviando..." : "Enviar"}
         </button>
       </form>
     </div>
