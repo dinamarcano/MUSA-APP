@@ -1,0 +1,122 @@
+{
+  "comments": {
+    "1": [
+      {
+        "id": 1001,
+        "author": "María González",
+        "text": "¡Qué obra tan impresionante! Los colores y las pinceladas de Van Gogh son simplemente increíbles. 🌟",
+        "createdAt": "2024-01-15T10:30:00.000Z"
+      },
+      {
+        "id": 1002,
+        "author": "Carlos Rodríguez",
+        "text": "Noche estrellada siempre me ha fascinado. La forma en que captura el movimiento del cielo es magistral.",
+        "createdAt": "2024-01-16T14:20:00.000Z"
+      },
+      {
+        "id": 1003,
+        "author": "Ana Martínez",
+        "text": "Una de mis pinturas favoritas de todos los tiempos. La técnica y la emoción que transmite son únicas. 💙",
+        "createdAt": "2024-01-17T09:15:00.000Z"
+      }
+    ],
+    "2": [
+      {
+        "id": 2001,
+        "author": "Luis Fernández",
+        "text": "Monet tenía una forma única de capturar la luz en el agua. Los nenúfares son simplemente hermosos. 🎨",
+        "createdAt": "2024-01-18T11:45:00.000Z"
+      },
+      {
+        "id": 2002,
+        "author": "Sofia Pérez",
+        "text": "Me encanta cómo los colores se fusionan en esta obra. Es como estar en un jardín de ensueño.",
+        "createdAt": "2024-01-19T16:30:00.000Z"
+      }
+    ],
+    "3": [
+      {
+        "id": 3001,
+        "author": "Diego Sánchez",
+        "text": "La creación de Adán es una de las obras más importantes del Renacimiento. La técnica de Michelangelo es impresionante.",
+        "createdAt": "2024-01-20T08:00:00.000Z"
+      },
+      {
+        "id": 3002,
+        "author": "Laura Gómez",
+        "text": "La expresión en los rostros y la composición son perfectas. Una verdadera obra maestra. 👏",
+        "createdAt": "2024-01-21T13:25:00.000Z"
+      }
+    ],
+    "4": [
+      {
+        "id": 4001,
+        "author": "Pedro López",
+        "text": "Picasso revolucionó el arte con su estilo único. Esta obra es un ejemplo perfecto de su genialidad.",
+        "createdAt": "2024-01-22T10:10:00.000Z"
+      }
+    ],
+    "5": [
+      {
+        "id": 5001,
+        "author": "Carmen Ruiz",
+        "text": "El beso de Klimt es una de las obras más románticas que he visto. Los detalles en oro son espectaculares. ✨",
+        "createdAt": "2024-01-23T15:40:00.000Z"
+      },
+      {
+        "id": 5002,
+        "author": "Jorge Torres",
+        "text": "La combinación de colores y patrones en esta obra es única. Klimt era un verdadero artista.",
+        "createdAt": "2024-01-24T12:00:00.000Z"
+      }
+    ],
+    "6": [
+      {
+        "id": 6001,
+        "author": "Isabel Moreno",
+        "text": "El grito de Munch transmite tanta emoción. Es imposible no sentirse conmovido al ver esta obra.",
+        "createdAt": "2024-01-25T09:30:00.000Z"
+      },
+      {
+        "id": 6002,
+        "author": "Roberto Vargas",
+        "text": "Una de las obras más expresivas del arte moderno. Munch capturó perfectamente la angustia humana.",
+        "createdAt": "2024-01-26T14:15:00.000Z"
+      }
+    ],
+    "7": [
+      {
+        "id": 7001,
+        "author": "Patricia Díaz",
+        "text": "Frida Kahlo es una inspiración. Su autorretrato muestra su fortaleza y su arte único. 💪",
+        "createdAt": "2024-01-27T11:20:00.000Z"
+      },
+      {
+        "id": 7002,
+        "author": "Fernando Castro",
+        "text": "Los colores vibrantes y el simbolismo en esta obra son increíbles. Frida era una artista excepcional.",
+        "createdAt": "2024-01-28T16:50:00.000Z"
+      }
+    ],
+    "8": [
+      {
+        "id": 8001,
+        "author": "Lucía Hernández",
+        "text": "La persistencia de la memoria de Dalí es surrealismo puro. Los relojes derretidos son icónicos. 🕐",
+        "createdAt": "2024-01-29T10:05:00.000Z"
+      },
+      {
+        "id": 8002,
+        "author": "Miguel Ángel",
+        "text": "Dalí tenía una imaginación sin límites. Esta obra es un viaje al subconsciente.",
+        "createdAt": "2024-01-30T13:40:00.000Z"
+      },
+      {
+        "id": 8003,
+        "author": "Elena Ramírez",
+        "text": "Cada vez que veo esta obra encuentro algo nuevo. El nivel de detalle es asombroso.",
+        "createdAt": "2024-01-31T08:25:00.000Z"
+      }
+    ]
+  }
+}

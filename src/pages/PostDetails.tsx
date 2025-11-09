@@ -1,31 +1,126 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { HiHeart, HiArrowLeft, HiChatAlt } from 'react-icons/hi';
+import { artworks } from '../assets/data/artworks';
+import { getCommentsByPostId, addComment as addCommentApi, initializeComments } from '../utils/commentsApi';
+import { getLikesByPostId, toggleLike as toggleLikeApi, initializeLikes } from '../utils/likesApi';
+import type { Comment } from '../types/posts';
+import Comments from '../Components/Comments';
+import type { Post } from '../types/posts';
 
 const PostDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const postData = {
-    id: id,
-    image: "https://upload.wikimedia.org/wikipedia/commons/b/b4/Vincent_Willem_van_Gogh_128.jpg",
-    title: "Girasoles",
-    description: "Una reinterpretación moderna de la obra clásica de Van Gogh",
-    author: {
-      name: "Daniele Gomez",
-      avatar: "https://static.vecteezy.com/system/resources/previews/034/371/675/non_2x/person-silhouette-icon-user-icon-vector.jpg",
-      followers: "1.2K seguidores"
-    },
-    likes: 245,
-    comments: 36,
-    publishedDate: "Publicado hace 2 días"
-  };
+  const [artwork, setArtwork] = useState(artworks.find(a => a.id.toString() === id));
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showComments, setShowComments] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+
+  // Cargar datos del artwork, comentarios y likes
+  useEffect(() => {
+    const loadPostData = async () => {
+      try {
+        // Inicializar comentarios y likes desde JSON
+        await initializeComments();
+        await initializeLikes();
+        
+        // Buscar el artwork por ID
+        const foundArtwork = artworks.find(a => a.id.toString() === id);
+        if (!foundArtwork) {
+          console.error('Artwork no encontrado');
+          return;
+        }
+        
+        setArtwork(foundArtwork);
+        
+        // Cargar likes del post
+        const likeData = await getLikesByPostId(id || '');
+        setLikesCount(likeData.count);
+        setLiked(likeData.likedByUser);
+        
+        // Cargar comentarios del post
+        const postComments = await getCommentsByPostId(id || '');
+        setComments(postComments);
+      } catch (error) {
+        console.error('Error al cargar datos del post:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      loadPostData();
+    }
+  }, [id]);
 
   const handleBack = () => {
     navigate(-1);
   };
 
   const handleAuthorClick = () => {
-    navigate(`/profile/${postData.author.name}`);
+    if (artwork) {
+      navigate(`/profile/${artwork.artist}`);
+    }
+  };
+
+  const handleLike = async () => {
+    try {
+      if (!id) return;
+      
+      // Alternar like usando la API
+      const newLikeState = await toggleLikeApi(id);
+      
+      // Actualizar el estado local
+      setLiked(newLikeState.likedByUser);
+      setLikesCount(newLikeState.count);
+    } catch (error) {
+      console.error('Error al alternar like:', error);
+      alert("Error al actualizar el like. Por favor, intenta de nuevo.");
+    }
+  };
+
+  const handleAddComment = async (postId: number, text: string) => {
+    try {
+      const newComment = await addCommentApi(postId, {
+        author: "Usuario",
+        text,
+      });
+
+      setComments(prev => [...prev, newComment]);
+    } catch (error) {
+      console.error('Error al agregar comentario:', error);
+      alert("Error al agregar el comentario. Por favor, intenta de nuevo.");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-gray-600">Cargando...</div>
+      </div>
+    );
+  }
+
+  if (!artwork) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-gray-600">Publicación no encontrada</div>
+      </div>
+    );
+  }
+
+  // Crear objeto Post para el componente Comments
+  const post: Post = {
+    id: artwork.id,
+    image: artwork.image,
+    title: artwork.title,
+    description: "",
+    author: artwork.artist,
+    likes: likesCount,
+    likedByMe: liked,
+    comments: comments,
   };
 
   return (
@@ -57,8 +152,8 @@ const PostDetail: React.FC = () => {
             {/* Imagen del post */}
             <div className="relative">
               <img 
-                src={postData.image} 
-                alt={postData.title}
+                src={artwork.image} 
+                alt={artwork.title}
                 className="w-full h-96 object-cover"
               />
             </div>
@@ -71,55 +166,85 @@ const PostDetail: React.FC = () => {
                 onClick={handleAuthorClick}
               >
                 <img 
-                  src={postData.author.avatar} 
-                  alt={postData.author.name}
+                  src="https://static.vecteezy.com/system/resources/previews/034/371/675/non_2x/person-silhouette-icon-user-icon-vector.jpg" 
+                  alt={artwork.artist}
                   className="w-10 h-10 rounded-full border border-gray-300"
                 />
                 <div>
-                  <h3 className="font-semibold text-gray-800">{postData.author.name}</h3>
-                  <p className="text-sm text-gray-500">{postData.author.followers}</p>
+                  <h3 className="font-semibold text-gray-800">{artwork.artist}</h3>
+                  <p className="text-sm text-gray-500">Artista</p>
                 </div>
               </div>
 
               {/* Título y descripción */}
               <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">{postData.title}</h1>
-                <p className="text-gray-600">{postData.description}</p>
-                <p className="text-sm text-gray-400 mt-2">{postData.publishedDate}</p>
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">{artwork.title}</h1>
+                <p className="text-gray-600">Obra de arte destacada</p>
               </div>
 
               {/* Estadísticas */}
               <div className="flex items-center space-x-6 border-t border-b border-gray-200 py-4 mb-6">
                 <div className="flex items-center space-x-2 text-gray-700">
                   <HiHeart className="w-5 h-5 text-red-500" />
-                  <span className="font-medium">{postData.likes} me gusta</span>
+                  <span className="font-medium">{likesCount} me gusta</span>
                 </div>
                 <div className="flex items-center space-x-2 text-gray-700">
                   <HiChatAlt className="w-5 h-5 text-blue-500" />
-                  <span className="font-medium">{postData.comments} comentarios</span>
+                  <span className="font-medium">{comments.length} comentarios</span>
                 </div>
               </div>
 
               {/* Acciones */}
               <div className="flex space-x-4">
-                <button className="flex items-center space-x-2 bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                <button 
+                  onClick={handleLike}
+                  className={`flex items-center space-x-2 px-6 py-2 rounded-lg transition-colors ${
+                    liked 
+                      ? 'bg-red-500 text-white hover:bg-red-600' 
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
                   <HiHeart className="w-5 h-5" />
-                  <span>Me gusta</span>
+                  <span>{liked ? 'Te gusta' : 'Me gusta'}</span>
                 </button>
-                <button className="flex items-center space-x-2 border border-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                <button 
+                  onClick={() => setShowComments(!showComments)}
+                  className="flex items-center space-x-2 border border-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                >
                   <HiChatAlt className="w-5 h-5" />
                   <span>Comentar</span>
                 </button>
               </div>
 
-              <div className="mt-6">
-                <h3 className="font-semibold text-gray-800 mb-4">Comentarios</h3>
-                <div className="space-y-4">
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-gray-600">¡Hermosa interpretación! Los colores son increíbles. 🎨</p>
+              {/* Sección de comentarios */}
+              {showComments && (
+                <div className="mt-6">
+                  <Comments post={post} onAddComment={handleAddComment} />
+                </div>
+              )}
+
+              {/* Mostrar comentarios si no están en el componente Comments */}
+              {!showComments && comments.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="font-semibold text-gray-800 mb-4">Comentarios ({comments.length})</h3>
+                  <div className="space-y-3 max-h-60 overflow-y-auto">
+                    {comments.slice(0, 3).map((comment) => (
+                      <div key={comment.id} className="bg-gray-50 p-4 rounded-lg">
+                        <p className="font-medium text-gray-800 text-sm mb-1">{comment.author}</p>
+                        <p className="text-gray-600">{comment.text}</p>
+                      </div>
+                    ))}
+                    {comments.length > 3 && (
+                      <button 
+                        onClick={() => setShowComments(true)}
+                        className="text-blue-600 text-sm hover:underline"
+                      >
+                        Ver todos los comentarios ({comments.length})
+                      </button>
+                    )}
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </section>
