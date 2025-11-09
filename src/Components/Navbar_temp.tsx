@@ -117,11 +117,9 @@ const Navbar: React.FC<NavbarProps> = ({ onGoToMain }) => {
 
       {/* Usuario */}
       <div className="flex items-center space-x-4">
-        <button className="text-sm text-gray-700 hover:text-blue-600 transition-colors">
-          Iniciar sesión
+        <button className="text-sm text-gray-700">
         </button>
-        <button className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600 transition-colors">
-          Registrarse
+        <button className=" text-white px-4 py-2 rounded-lg text-sm">
         </button>
         
         <img 

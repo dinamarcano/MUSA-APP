@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { 
   HiHome, 
   HiBell, 
-  HiMail, 
-  HiUser,
   HiChevronLeft,
   HiSearch,
   HiSparkles,
@@ -50,7 +48,6 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
     }
   ];
 
-  // MENÚ DE NAVEGACIÓN COMPLETO
   const menuItems = [
     { icon: HiHome, label: 'Inicio', action: () => onGoToMain?.() },
     { icon: RiArtboardFill, label: 'Tableros', action: () => setPage?.('boards') },
@@ -94,8 +91,8 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
 
   return (
     <>
-      {/* Sidebar para desktop */}
-      <div className="hidden md:flex w-16 bg-white border-r border-gray-200 text-gray-700 min-h-screen flex-col items-center py-4 relative">
+      {}
+      <div className="hidden md:flex w-16 bg-white border-r border-gray-200 text-gray-700 min-h-screen flex-col items-center py-4 fixed left-0 top-0 h-full overflow-y-auto">
         
         <div className="space-y-6">
           {menuItems.map((item, index) => {
@@ -114,7 +111,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
           
           <div className="border-t border-gray-200 my-2"></div>
           
-          {/* Botón de notificaciones */}
+          {}
           <button 
             className="relative p-3 hover:bg-blue-50 rounded-xl transition-all duration-200 text-gray-600 hover:text-blue-600"
             onClick={() => setShowNotifications(true)}
@@ -123,27 +120,15 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
             <HiBell className="w-6 h-6" />
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
           </button>
-          
-          <button 
-            className="p-3 hover:bg-blue-50 rounded-xl transition-all duration-200 text-gray-600 hover:text-blue-600"
-            title="Mensajes"
-          >
-            <HiMail className="w-6 h-6" />
-          </button>
 
-          <button 
-            className="p-3 hover:bg-blue-50 rounded-xl transition-all duration-200 text-gray-600 hover:text-blue-600"
-            title="Perfil"
-          >
-            <HiUser className="w-6 h-6" />
-          </button>
+          {}
         </div>
 
-        {/* Panel de notificaciones */}
+        {}
         {showNotifications && (
           <div className="fixed left-16 top-0 w-80 h-full bg-white border-l border-gray-200 shadow-xl z-50 overflow-hidden">
             
-            {/* Header del panel */}
+            {}
             <div className="p-4 border-b border-gray-200 bg-white sticky top-0 z-10">
               <div className="flex items-center space-x-3">
                 <button 
@@ -214,7 +199,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
         )}
       </div>
 
-      {/* Bottom Navigation Bar para móvil */}
+      {}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 shadow-lg">
         <div className="flex justify-around items-center py-3">
           {menuItems.map((item, index) => {
@@ -232,7 +217,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
             );
           })}
           
-          {/* Botón de notificaciones móvil */}
+          {}
           <button 
             className="relative flex flex-col items-center space-y-1 p-2 hover:bg-blue-50 rounded-xl transition-all duration-200 text-gray-600 hover:text-blue-600 min-w-0 flex-1"
             onClick={() => setShowNotifications(true)}
@@ -245,6 +230,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
         </div>
       </div>
 
+      {}
       {showNotifications && (
         <div className="md:hidden fixed inset-0 bg-white z-50 overflow-hidden">
           
@@ -285,7 +271,6 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
                 </div>
               </>
             ) : (
-              /* Vista detalle de notificación */
               <div className="space-y-6">
                 {(() => {
                   const details = getNotificationDetails(selectedNotification);
@@ -317,6 +302,9 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
           </div>
         </div>
       )}
+
+      {}
+      <div className="md:ml-16"></div>
     </>
   );
 };
