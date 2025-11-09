@@ -1,38 +1,44 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 interface LoginProps {
   onLogin: () => void;
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
-  const [email, setEmail] = useState(''); // Cambié username por email
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(''); // Estado para mensajes de error
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(''); // Limpiar errores anteriores
+    setError('');
 
-    // 1. Obtener usuarios guardados en LocalStorage
-    const storedUsers = JSON.parse(localStorage.getItem('users') || '[]');
-    
-    // 2. Buscar usuario que coincida con email y password
-    const user = storedUsers.find((user: any) => 
-      user.email === email && user.password === password
-    );
+    try {
+      // 1. Obtener usuarios de la API falsa
+      const response = await axios.get('http://localhost:3001/users');
+      const users = response.data;
 
-    if (user) {
-      // 3. Login exitoso
-      console.log('Login exitoso:', user);
-      localStorage.setItem('currentUser', JSON.stringify(user)); // Guardar sesión
-      onLogin();
-      navigate('/');
-    } else {
-      // 4. Login fallido
-      setError('Email o contraseña incorrectos');
-      console.log('Login fallido');
+      // 2. Buscar usuario que coincida
+      const user = users.find((user: any) => 
+        user.email === email && user.password === password
+      );
+
+      if (user) {
+        // 3. Login exitoso
+        console.log('Login exitoso:', user);
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        onLogin();
+        navigate('/');
+      } else {
+        // 4. Login fallido
+        setError('Email o contraseña incorrectos');
+      }
+    } catch (error) {
+      console.error('Error en login:', error);
+      setError('Error de conexión. Intenta nuevamente.');
     }
   };
 
@@ -61,7 +67,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               Correo electrónico
             </label>
             <input
-              type="email" // Cambié a type="email"
+              type="email"
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
