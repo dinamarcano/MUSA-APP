@@ -8,12 +8,11 @@ import {
 } from 'react-icons/hi';
 import { 
   RiArtboardFill,
-  RiBookmarkFill,
   RiSettings3Fill
 } from 'react-icons/ri';
 
 interface SidebarProps {
-  setPage?: (page: 'boards' | 'bookmarks' | 'preferences') => void;
+  setPage?: (page: 'boards' | 'preferences') => void;
   onGoToMain?: () => void;
 }
 
@@ -48,10 +47,10 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
     }
   ];
 
+  // Menu items sin "Guardados"
   const menuItems = [
     { icon: HiHome, label: 'Inicio', action: () => onGoToMain?.() },
     { icon: RiArtboardFill, label: 'Tableros', action: () => setPage?.('boards') },
-    { icon: RiBookmarkFill, label: 'Guardados', action: () => setPage?.('bookmarks') },
     { icon: RiSettings3Fill, label: 'Preferencias', action: () => setPage?.('preferences') },
   ];
 
@@ -91,7 +90,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
 
   return (
     <>
-      {}
+      {/* Sidebar para desktop */}
       <div className="hidden md:flex w-16 bg-white border-r border-gray-200 text-gray-700 min-h-screen flex-col items-center py-4 fixed left-0 top-0 h-full overflow-y-auto">
         
         <div className="space-y-6">
@@ -111,7 +110,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
           
           <div className="border-t border-gray-200 my-2"></div>
           
-          {}
+          {/* Botón de notificaciones */}
           <button 
             className="relative p-3 hover:bg-blue-50 rounded-xl transition-all duration-200 text-gray-600 hover:text-blue-600"
             onClick={() => setShowNotifications(true)}
@@ -120,15 +119,13 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
             <HiBell className="w-6 h-6" />
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
           </button>
-
-          {}
         </div>
 
-        {}
+        {/* Panel de notificaciones */}
         {showNotifications && (
           <div className="fixed left-16 top-0 w-80 h-full bg-white border-l border-gray-200 shadow-xl z-50 overflow-hidden">
             
-            {}
+            {/* Header del panel */}
             <div className="p-4 border-b border-gray-200 bg-white sticky top-0 z-10">
               <div className="flex items-center space-x-3">
                 <button 
@@ -199,11 +196,13 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
         )}
       </div>
 
-      {}
+      {/* Bottom Navigation Bar para móvil */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 shadow-lg">
         <div className="flex justify-around items-center py-3">
           {menuItems.map((item, index) => {
             const Icon = item.icon;
+            // Cambiar "Tableros" por "Favoritos" solo en móvil
+            const label = item.label === 'Tableros' ? 'Favoritos' : item.label;
             return (
               <button 
                 key={index}
@@ -212,12 +211,12 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
                 onClick={item.action}
               >
                 <Icon className="w-5 h-5" />
-                <span className="text-xs truncate max-w-[60px]">{item.label}</span>
+                <span className="text-xs truncate max-w-[60px]">{label}</span>
               </button>
             );
           })}
           
-          {}
+          {/* Botón de notificaciones móvil */}
           <button 
             className="relative flex flex-col items-center space-y-1 p-2 hover:bg-blue-50 rounded-xl transition-all duration-200 text-gray-600 hover:text-blue-600 min-w-0 flex-1"
             onClick={() => setShowNotifications(true)}
@@ -230,7 +229,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
         </div>
       </div>
 
-      {}
+      {/* Overlay de notificaciones para móvil */}
       {showNotifications && (
         <div className="md:hidden fixed inset-0 bg-white z-50 overflow-hidden">
           
@@ -303,7 +302,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
         </div>
       )}
 
-      {}
+      {/* Espacio para el contenido principal cuando sidebar es fija */}
       <div className="md:ml-16"></div>
     </>
   );

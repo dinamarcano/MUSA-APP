@@ -37,6 +37,13 @@
       "password": " sv wdsv",
       "birthDate": "2025-11-22",
       "createdAt": "2025-11-09T22:50:29.925Z"
+    },
+    {
+      "id": "00ca",
+      "email": "sofiamejianieto2006@gmail.com",
+      "password": "1234",
+      "birthDate": "2025-11-06",
+      "createdAt": "2025-11-10T03:54:24.532Z"
     }
   ],
   "posts": [
