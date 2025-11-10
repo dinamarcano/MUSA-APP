@@ -1,5 +1,9 @@
 import { useState } from "react";
 
+interface PreferencesProps {
+  onContinue?: () => void;
+}
+
 const categories = [
   { name: "Pintura", img: "https://upload.wikimedia.org/wikipedia/commons/b/b4/Vincent_Willem_van_Gogh_128.jpg" },
   { name: "Cubismo", img: "https://i.pinimg.com/736x/95/5d/7b/955d7bc13fccbc8da479b178772a74f9.jpg" },
@@ -13,7 +17,7 @@ const categories = [
   { name: "Bauhaus", img: "https://i.pinimg.com/1200x/0f/1a/86/0f1a86e4e6792baf7d8f6544b18a7c21.jpg" },
 ];
 
-export default function Preferences() {
+export default function Preferences({ onContinue }: PreferencesProps) {
   const [selected, setSelected] = useState<string[]>([]);
 
   const toggleSelect = (name: string) => {
@@ -64,7 +68,11 @@ export default function Preferences() {
       {/* Botón continuar */}
       <button
         className="bg-red-700 text-white px-8 py-3 rounded-full mt-10 hover:bg-red-800 transition-colors shadow-lg"
-        onClick={() => alert(`Has seleccionado: ${selected.join(", ")}`)}
+        onClick={() => {
+          const message = `Has seleccionado: ${selected.join(", ")}`;
+          if (onContinue) onContinue();
+          else alert(message);
+        }}
       >
         Continuar
       </button>
