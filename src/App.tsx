@@ -15,6 +15,7 @@ import CreateAccount from "./Components/CreateAccount";
 import PostDetails from "./Components/PostDetails";
 import PostDetailPage from "./pages/PostDetailPage";
 import SearchResults from "./Components/SearchResults"; 
+import SearchPostDetailPage from "./Components/SearchPostDetailPage"; // Importa el nuevo componente
 
 export interface SearchResult {
   id: number;
@@ -232,12 +233,23 @@ export default function App() {
               </ProtectedRoute>
             } 
           />
+          
           {/* Main gallery post detail (local artworks) */}
           <Route
             path="/post/:id"
             element={
               <ProtectedRoute>
                 <PostDetailPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Nueva ruta para posts de búsqueda */}
+          <Route
+            path="/search-post/:id"
+            element={
+              <ProtectedRoute>
+                <SearchPostDetailPage />
               </ProtectedRoute>
             }
           />

@@ -44,6 +44,13 @@
       "password": "1234",
       "birthDate": "2025-11-06",
       "createdAt": "2025-11-10T03:54:24.532Z"
+    },
+    {
+      "id": "4fd7",
+      "email": "sofiamejianieto2006@gmail.com",
+      "password": "1234",
+      "birthDate": "2025-11-05",
+      "createdAt": "2025-11-10T05:07:29.006Z"
     }
   ],
   "posts": [
