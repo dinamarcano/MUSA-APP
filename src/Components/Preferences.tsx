@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface PreferencesProps {
   onContinue?: () => void;
@@ -19,6 +20,7 @@ const categories = [
 
 export default function Preferences({ onContinue }: PreferencesProps) {
   const [selected, setSelected] = useState<string[]>([]);
+  const navigate = useNavigate();
 
   const toggleSelect = (name: string) => {
     setSelected((prev) =>
@@ -26,12 +28,22 @@ export default function Preferences({ onContinue }: PreferencesProps) {
     );
   };
 
+  const handleContinue = () => {
+    // Guardar preferencias (aquí puedes agregar lógica para guardar en tu backend)
+    console.log(`Preferencias seleccionadas: ${selected.join(", ")}`);
+    
+    // Ejecutar el callback de login/continuar
+    onContinue();
+    
+    // Navegar a la main page
+    navigate("/");
+  };
+
   return (
     <section className="flex flex-col items-center justify-center min-h-screen bg-white px-6 py-10">
       {/* Logo opcional arriba */}
       <div className="flex items-center justify-center mb-6">
-      <img src="/assets/logo.png" alt="Logo" className="w-20 h-20" />
-      
+        <img src="/assets/logo.png" alt="Logo" className="w-20 h-20" />
       </div>
 
       <h2 className="text-3xl font-bold text-gray-900 mb-2">

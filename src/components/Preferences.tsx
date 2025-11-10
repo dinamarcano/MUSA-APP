@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface PreferencesProps {
   onContinue?: () => void;
@@ -19,11 +20,23 @@ const categories = [
 
 export default function Preferences({ onContinue }: PreferencesProps) {
   const [selected, setSelected] = useState<string[]>([]);
+  const navigate = useNavigate();
 
   const toggleSelect = (name: string) => {
     setSelected((prev) =>
       prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
     );
+  };
+
+  const handleContinue = () => {
+    // Guardar preferencias (aquí puedes agregar lógica para guardar en tu backend)
+    console.log(`Preferencias seleccionadas: ${selected.join(", ")}`);
+    
+    // Ejecutar el callback de login/continuar
+    onContinue();
+    
+    // Navegar a la main page
+    navigate("/");
   };
 
   return (

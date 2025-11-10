@@ -1,151 +1,101 @@
 import axios from "axios";
 import type { Comment } from "../types/posts";
 
-// Configuración centralizada para el sistema de comentarios
-const CONFIG = {
-  JSON_URL: "/comments.json", // URL del archivo JSON en public/
-  STORAGE_KEY: "comments_db", // Clave para localStorage
-} as const;
+const BASE_URL =
+  import.meta.env.VITE_JSON_SERVER_URL ?? "http://localhost:3000";
 
-// Interfaz para la estructura del JSON
-interface CommentsData {
-  comments: {
-    [postId: string]: Comment[];
+const COMMENTS_ENDPOINT = `${BASE_URL}/comments`;
+
+interface CommentRecord extends Comment {
+  postId: number | string;
+}
+
+function normalizePostId(postId: number | string): number | string {
+  const numeric = Number(postId);
+  return Number.isFinite(numeric) ? numeric : postId.toString();
+}
+
+function toComment(record: CommentRecord): Comment {
+  const { id, author, text, createdAt, postId } = record;
+  return {
+    id,
+    author,
+    text,
+    createdAt,
+    postId,
   };
 }
 
-// Cargar comentarios iniciales desde el JSON usando axios
-export async function loadCommentsFromJSON(): Promise<
-  CommentsData["comments"]
-> {
-  try {
-    const response = await axios.get<CommentsData>(CONFIG.JSON_URL);
-    return response.data.comments || {};
-  } catch (error) {
-    console.error("Error al cargar comentarios desde JSON:", error);
-    return {};
-  }
-}
-
-// Obtener comentarios de un post específico (dinámico por ID)
 export async function getCommentsByPostId(
   postId: number | string
 ): Promise<Comment[]> {
   try {
-    const postIdStr = postId.toString();
-
-    // Primero intentamos cargar desde localStorage (si hay cambios locales)
-    const localData = localStorage.getItem(CONFIG.STORAGE_KEY);
-    if (localData) {
-      const localComments: CommentsData["comments"] = JSON.parse(localData);
-      if (localComments[postIdStr]) {
-        return localComments[postIdStr];
-      }
-    }
-
-    // Si no hay datos locales, cargamos desde el JSON
-    const commentsData = await loadCommentsFromJSON();
-    return commentsData[postIdStr] || [];
+    const normalizedPostId = normalizePostId(postId);
+    const response = await axios.get<CommentRecord[]>(COMMENTS_ENDPOINT, {
+      params: { postId: normalizedPostId },
+    });
+    return response.data.map(toComment);
   } catch (error) {
-    console.error("Error al obtener comentarios:", error);
+    console.error("Error al obtener comentarios desde json-server:", error);
     return [];
   }
 }
 
-// Obtener todos los comentarios (combinando JSON y localStorage)
-export async function getAllComments(): Promise<CommentsData["comments"]> {
+export async function getAllComments(): Promise<Record<string, Comment[]>> {
   try {
-    // Cargar comentarios iniciales desde JSON
-    const jsonComments = await loadCommentsFromJSON();
-
-    // Cargar comentarios locales (si existen)
-    const localData = localStorage.getItem(CONFIG.STORAGE_KEY);
-    if (localData) {
-      const localComments: CommentsData["comments"] = JSON.parse(localData);
-      // Combinar: los comentarios locales tienen prioridad
-      return { ...jsonComments, ...localComments };
-    }
-
-    return jsonComments;
+    const response = await axios.get<CommentRecord[]>(COMMENTS_ENDPOINT);
+    return response.data.reduce<Record<string, Comment[]>>(
+      (accumulator, record) => {
+        const key = record.postId.toString();
+        if (!accumulator[key]) {
+          accumulator[key] = [];
+        }
+        accumulator[key].push(toComment(record));
+        return accumulator;
+      },
+      {}
+    );
   } catch (error) {
     console.error("Error al obtener todos los comentarios:", error);
     return {};
   }
 }
 
-// Agregar un comentario a un post (dinámico por ID)
 export async function addComment(
   postId: number | string,
-  comment: Omit<Comment, "id" | "createdAt">
+  comment: Omit<Comment, "id" | "createdAt" | "postId">
 ): Promise<Comment> {
   try {
-    // Obtener comentarios actuales
-    const allComments = await getAllComments();
-    const postIdStr = postId.toString();
-
-    // Crear el nuevo comentario
-    const newComment: Comment = {
-      id: Date.now(),
-      ...comment,
+    const normalizedPostId = normalizePostId(postId);
+    const payload = {
+      postId: normalizedPostId,
+      author: comment.author,
+      text: comment.text,
       createdAt: new Date().toISOString(),
     };
 
-    // Si el post no existe, crear un array vacío para él (dinámico)
-    if (!allComments[postIdStr]) {
-      allComments[postIdStr] = [];
-    }
-
-    // Agregar el comentario al array del post
-    const postComments = allComments[postIdStr];
-    allComments[postIdStr] = [...postComments, newComment];
-
-    // Guardar en localStorage (persistencia local)
-    localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(allComments));
-
-    return newComment;
+    const response = await axios.post<CommentRecord>(
+      COMMENTS_ENDPOINT,
+      payload
+    );
+    return toComment(response.data);
   } catch (error) {
-    console.error("Error al agregar comentario:", error);
+    console.error("Error al agregar comentario en json-server:", error);
     throw error;
   }
 }
 
-// Eliminar un comentario (dinámico por ID)
-export async function deleteComment(
-  postId: number | string,
-  commentId: number
-): Promise<void> {
+export async function deleteComment(commentId: number): Promise<void> {
   try {
-    const allComments = await getAllComments();
-    const postIdStr = postId.toString();
-
-    if (allComments[postIdStr]) {
-      allComments[postIdStr] = allComments[postIdStr].filter(
-        (c) => c.id !== commentId
-      );
-      localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(allComments));
-    }
+    await axios.delete(`${COMMENTS_ENDPOINT}/${commentId}`);
   } catch (error) {
-    console.error("Error al eliminar comentario:", error);
+    console.error("Error al eliminar comentario en json-server:", error);
     throw error;
   }
 }
 
-// Inicializar comentarios (cargar desde JSON al inicio de la app)
 export async function initializeComments(): Promise<void> {
-  try {
-    const jsonComments = await loadCommentsFromJSON();
-
-    // Si no hay datos en localStorage, inicializar con los del JSON
-    const localData = localStorage.getItem(CONFIG.STORAGE_KEY);
-    if (!localData) {
-      localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(jsonComments));
-    } else {
-      // Combinar comentarios del JSON con los locales
-      const localComments: CommentsData["comments"] = JSON.parse(localData);
-      const merged = { ...jsonComments, ...localComments };
-      localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(merged));
-    }
-  } catch (error) {
-    console.error("Error al inicializar comentarios:", error);
-  }
+  // Ya no es necesario inicializar datos desde archivos locales,
+  // pero mantenemos la función para compatibilidad con la llamada existente.
+  return Promise.resolve();
 }

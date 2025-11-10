@@ -12,73 +12,78 @@
       "email": "juanito@chancla",
       "password": "chancla",
       "birthDate": "2004-02-12",
-      "createdAt": "2025-11-08T18:30:09.523Z",
-      "name": "juan",
-      "username": "juanito123",
-      "avatar": "https://i.redd.it/meu-gato-%C3%A9-praticamente-o-gato-do-meme-v0-n9dleoj8dgfc1.jpg?width=720&format=pjpg&auto=webp&s=426eb562eddf7898e5ba777104b7065552be8114"
+      "createdAt": "2025-11-08T18:30:09.523Z"
     },
     {
-      "id": "a1d7",
-      "email": "sofiamejianieto2006@gmail.com",
-      "password": "cwvdsv",
-      "birthDate": "2025-11-19",
-      "createdAt": "2025-11-09T22:14:59.272Z"
+      "id": "0908",
+      "email": "franciscojosemadrid05@gmail.com",
+      "password": "Juanito2023",
+      "birthDate": "2005-09-15",
+      "createdAt": "2025-11-09T21:31:11.941Z"
     },
     {
-      "id": "0a2a",
-      "email": "sofiamejianieto2006@gmail.com",
-      "password": "cacvcasc",
-      "birthDate": "2025-11-13",
-      "createdAt": "2025-11-09T22:49:59.458Z"
+      "id": "36e5",
+      "email": "franciscojosemadrid05@gmail.com",
+      "password": "Juanito2023",
+      "birthDate": "2005-06-15",
+      "createdAt": "2025-11-09T21:39:11.317Z"
     },
     {
-      "id": "f179",
-      "email": "1109187969@u.icesi.edu.co",
-      "password": " sv wdsv",
-      "birthDate": "2025-11-22",
-      "createdAt": "2025-11-09T22:50:29.925Z"
+      "id": "bf10",
+      "email": "franciscojosemadrid05@gmail.com",
+      "password": "Juanito2023",
+      "birthDate": "2004-05-13",
+      "createdAt": "2025-11-09T21:46:01.107Z"
     },
     {
-      "id": "00ca",
-      "email": "sofiamejianieto2006@gmail.com",
-      "password": "1234",
-      "birthDate": "2025-11-06",
-      "createdAt": "2025-11-10T03:54:24.532Z"
-    },
-    {
-      "id": "4fd7",
-      "email": "sofiamejianieto2006@gmail.com",
-      "password": "1234",
-      "birthDate": "2025-11-05",
-      "createdAt": "2025-11-10T05:07:29.006Z"
+      "id": "88d9",
+      "email": "franciscojosemadrid05@gmail.com",
+      "password": "1111111",
+      "birthDate": "2008-05-18",
+      "createdAt": "2025-11-10T14:32:45.786Z"
     }
   ],
-  "posts": [
+  "comments": [
     {
-      "id": "b715",
-      "userId": "4687",
-      "image": "https://i.pinimg.com/236x/b0/f0/52/b0f0524e80ed52cf5a38d0fa93035a95.jpg",
-      "title": "hola",
-      "description": "1111",
-      "tags": [
-        "arte"
-      ],
-      "createdAt": "2025-11-10T00:20:06.494Z",
-      "likes": 0,
-      "comments": []
+      "id": "5537",
+      "postId": 2,
+      "author": "Usuario",
+      "text": "hola",
+      "createdAt": "2025-11-10T14:35:42.042Z"
     },
     {
-      "id": "47f7",
-      "userId": "4687",
-      "image": "https://images3.memedroid.com/images/UPLOADED29/65c9cca3c0afa.jpeg",
-      "title": "adios",
-      "description": "123",
-      "tags": [
-        "oleo"
-      ],
-      "createdAt": "2025-11-10T01:07:53.888Z",
-      "likes": 2,
-      "comments": []
+      "id": "3618",
+      "postId": 4,
+      "author": "Usuario",
+      "text": "Muy lindo",
+      "createdAt": "2025-11-10T14:36:23.781Z"
+    },
+    {
+      "id": "28ae",
+      "postId": 7,
+      "author": "Usuario",
+      "text": "hola",
+      "createdAt": "2025-11-10T14:39:14.130Z"
+    }
+  ],
+  "likes": [
+    {
+      "id": "4f48",
+      "postId": 2,
+      "count": 1,
+      "likedByUser": true
+    },
+    {
+      "id": "282d",
+      "postId": 4,
+      "count": 1,
+      "likedByUser": true
+    },
+    {
+      "id": "f9b2",
+      "postId": 7,
+      "count": 1,
+      "likedByUser": true
     }
   ]
 }
