@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 interface CreateAccountProps {
   onContinue: () => void;
@@ -11,29 +12,33 @@ const CreateAccount: React.FC<CreateAccountProps> = ({ onContinue }) => {
   const [birthDate, setBirthDate] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // 1. Crear objeto con datos del usuario
-    const userData = {
-      email,
-      password,
-      birthDate,
-      createdAt: new Date().toISOString()
-    };
+    try {
+      // 1. Crear objeto con datos del usuario
+      const userData = {
+        email,
+        password,
+        birthDate,
+        createdAt: new Date().toISOString()
+      };
 
-    // 2. Guardar en LocalStorage (PERSISTENTE)
-    localStorage.setItem('userData', JSON.stringify(userData));
-    
-    // 3. Guardar también en una lista de usuarios
-    const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-    const updatedUsers = [...existingUsers, userData];
-    localStorage.setItem('users', JSON.stringify(updatedUsers));
+      // 2. Guardar en JSON Server (API falsa)
+      const response = await axios.post('http://localhost:3001/users', userData);
+      
+      console.log('Usuario creado en API:', response.data);
 
-    console.log('Cuenta creada y guardada en LOCAL STORAGE:', userData);
-    
-    onContinue();
-    navigate('/preferencias');
+      // 3. También guardar en LocalStorage por compatibilidad
+      localStorage.setItem('userData', JSON.stringify(userData));
+
+      onContinue();
+      navigate('/preferencias');
+      
+    } catch (error) {
+      console.error('Error creando usuario:', error);
+      alert('Error al crear la cuenta. Intenta nuevamente.');
+    }
   };
 
   return (

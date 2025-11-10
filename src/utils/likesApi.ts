@@ -1,60 +1,56 @@
 import axios from "axios";
 
-// Configuración centralizada para el sistema de likes
-const CONFIG = {
-  JSON_URL: "/likes.json", // URL del archivo JSON en public/
-  STORAGE_KEY: "likes_db", // Clave para localStorage
-} as const;
+const BASE_URL =
+  import.meta.env.VITE_JSON_SERVER_URL ?? "http://localhost:3000";
 
-// Interfaz para la estructura del JSON
-interface LikeData {
+const LIKES_ENDPOINT = `${BASE_URL}/likes`;
+
+export interface LikeData {
   count: number;
   likedByUser: boolean;
 }
 
-interface LikesData {
-  likes: {
-    [postId: string]: LikeData;
+interface LikeRecord extends LikeData {
+  id: number;
+  postId: number | string;
+}
+
+function normalizePostId(postId: number | string): number | string {
+  const numeric = Number(postId);
+  return Number.isFinite(numeric) ? numeric : postId.toString();
+}
+
+function toLike(record: LikeRecord): LikeData {
+  return {
+    count: record.count,
+    likedByUser: record.likedByUser,
   };
 }
 
-// Cargar likes iniciales desde el JSON usando axios
-export async function loadLikesFromJSON(): Promise<LikesData["likes"]> {
-  try {
-    const response = await axios.get<LikesData>(CONFIG.JSON_URL);
-    return response.data.likes || {};
-  } catch (error) {
-    console.error("Error al cargar likes desde JSON:", error);
-    return {};
-  }
+async function findLikeRecord(
+  postId: number | string
+): Promise<LikeRecord | undefined> {
+  const normalizedPostId = normalizePostId(postId);
+  const response = await axios.get<LikeRecord[]>(LIKES_ENDPOINT, {
+    params: { postId: normalizedPostId },
+  });
+  return response.data[0];
 }
 
-// Obtener likes de un post específico (dinámico por ID)
 export async function getLikesByPostId(
   postId: number | string
 ): Promise<LikeData> {
   try {
-    const postIdStr = postId.toString();
-
-    // Primero intentamos cargar desde localStorage (si hay cambios locales)
-    const localData = localStorage.getItem(CONFIG.STORAGE_KEY);
-    if (localData) {
-      const localLikes: LikesData["likes"] = JSON.parse(localData);
-      if (localLikes[postIdStr]) {
-        return localLikes[postIdStr];
-      }
-    }
-
-    // Si no hay datos locales, cargamos desde el JSON
-    const likesData = await loadLikesFromJSON();
-    return (
-      likesData[postIdStr] || {
+    const record = await findLikeRecord(postId);
+    if (!record) {
+      return {
         count: 0,
         likedByUser: false,
-      }
-    );
+      };
+    }
+    return toLike(record);
   } catch (error) {
-    console.error("Error al obtener likes:", error);
+    console.error("Error al obtener likes desde json-server:", error);
     return {
       count: 0,
       likedByUser: false,
@@ -62,78 +58,58 @@ export async function getLikesByPostId(
   }
 }
 
-// Obtener todos los likes (combinando JSON y localStorage)
-export async function getAllLikes(): Promise<LikesData["likes"]> {
+export async function getAllLikes(): Promise<
+  Record<string, LikeData>
+> {
   try {
-    // Cargar likes iniciales desde JSON
-    const jsonLikes = await loadLikesFromJSON();
-
-    // Cargar likes locales (si existen)
-    const localData = localStorage.getItem(CONFIG.STORAGE_KEY);
-    if (localData) {
-      const localLikes: LikesData["likes"] = JSON.parse(localData);
-      // Combinar: los likes locales tienen prioridad
-      return { ...jsonLikes, ...localLikes };
-    }
-
-    return jsonLikes;
+    const response = await axios.get<LikeRecord[]>(LIKES_ENDPOINT);
+    return response.data.reduce<Record<string, LikeData>>(
+      (accumulator, record) => {
+        const key = record.postId.toString();
+        accumulator[key] = toLike(record);
+        return accumulator;
+      },
+      {}
+    );
   } catch (error) {
     console.error("Error al obtener todos los likes:", error);
     return {};
   }
 }
 
-// Alternar like de un post (dinámico por ID)
 export async function toggleLike(postId: number | string): Promise<LikeData> {
   try {
-    // Obtener likes actuales
-    const allLikes = await getAllLikes();
-    const postIdStr = postId.toString();
+    const existing = await findLikeRecord(postId);
+    const normalizedPostId = normalizePostId(postId);
 
-    // Obtener el estado actual del like para este post
-    const currentLike = allLikes[postIdStr] || {
-      count: 0,
-      likedByUser: false,
+    if (!existing) {
+      const response = await axios.post<LikeRecord>(LIKES_ENDPOINT, {
+        postId: normalizedPostId,
+        count: 1,
+        likedByUser: true,
+      });
+      return toLike(response.data);
+    }
+
+    const nextState: LikeData = {
+      count: existing.likedByUser
+        ? Math.max(existing.count - 1, 0)
+        : existing.count + 1,
+      likedByUser: !existing.likedByUser,
     };
 
-    // Alternar el like
-    const newLikeState: LikeData = {
-      count: currentLike.likedByUser
-        ? currentLike.count - 1
-        : currentLike.count + 1,
-      likedByUser: !currentLike.likedByUser,
-    };
-
-    // Actualizar los likes
-    allLikes[postIdStr] = newLikeState;
-
-    // Guardar en localStorage (persistencia local)
-    localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(allLikes));
-
-    return newLikeState;
+    const response = await axios.patch<LikeRecord>(
+      `${LIKES_ENDPOINT}/${existing.id}`,
+      nextState
+    );
+    return toLike(response.data);
   } catch (error) {
-    console.error("Error al alternar like:", error);
+    console.error("Error al alternar like en json-server:", error);
     throw error;
   }
 }
 
-// Inicializar likes (cargar desde JSON al inicio de la app)
 export async function initializeLikes(): Promise<void> {
-  try {
-    const jsonLikes = await loadLikesFromJSON();
-
-    // Si no hay datos en localStorage, inicializar con los del JSON
-    const localData = localStorage.getItem(CONFIG.STORAGE_KEY);
-    if (!localData) {
-      localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(jsonLikes));
-    } else {
-      // Combinar likes del JSON con los locales
-      const localLikes: LikesData["likes"] = JSON.parse(localData);
-      const merged = { ...jsonLikes, ...localLikes };
-      localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(merged));
-    }
-  } catch (error) {
-    console.error("Error al inicializar likes:", error);
-  }
+  // La inicialización ya no es necesaria, pero se mantiene por compatibilidad.
+  return Promise.resolve();
 }
-

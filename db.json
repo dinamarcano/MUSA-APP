@@ -1,0 +1,89 @@
+{
+  "users": [
+    {
+      "id": "7c6a",
+      "email": "q@1",
+      "password": "12",
+      "birthDate": "1212-02-12",
+      "createdAt": "2025-11-08T18:20:20.956Z"
+    },
+    {
+      "id": "4687",
+      "email": "juanito@chancla",
+      "password": "chancla",
+      "birthDate": "2004-02-12",
+      "createdAt": "2025-11-08T18:30:09.523Z"
+    },
+    {
+      "id": "0908",
+      "email": "franciscojosemadrid05@gmail.com",
+      "password": "Juanito2023",
+      "birthDate": "2005-09-15",
+      "createdAt": "2025-11-09T21:31:11.941Z"
+    },
+    {
+      "id": "36e5",
+      "email": "franciscojosemadrid05@gmail.com",
+      "password": "Juanito2023",
+      "birthDate": "2005-06-15",
+      "createdAt": "2025-11-09T21:39:11.317Z"
+    },
+    {
+      "id": "bf10",
+      "email": "franciscojosemadrid05@gmail.com",
+      "password": "Juanito2023",
+      "birthDate": "2004-05-13",
+      "createdAt": "2025-11-09T21:46:01.107Z"
+    },
+    {
+      "id": "88d9",
+      "email": "franciscojosemadrid05@gmail.com",
+      "password": "1111111",
+      "birthDate": "2008-05-18",
+      "createdAt": "2025-11-10T14:32:45.786Z"
+    }
+  ],
+  "comments": [
+    {
+      "id": "5537",
+      "postId": 2,
+      "author": "Usuario",
+      "text": "hola",
+      "createdAt": "2025-11-10T14:35:42.042Z"
+    },
+    {
+      "id": "3618",
+      "postId": 4,
+      "author": "Usuario",
+      "text": "Muy lindo",
+      "createdAt": "2025-11-10T14:36:23.781Z"
+    },
+    {
+      "id": "28ae",
+      "postId": 7,
+      "author": "Usuario",
+      "text": "hola",
+      "createdAt": "2025-11-10T14:39:14.130Z"
+    }
+  ],
+  "likes": [
+    {
+      "id": "4f48",
+      "postId": 2,
+      "count": 1,
+      "likedByUser": true
+    },
+    {
+      "id": "282d",
+      "postId": 4,
+      "count": 1,
+      "likedByUser": true
+    },
+    {
+      "id": "f9b2",
+      "postId": 7,
+      "count": 1,
+      "likedByUser": true
+    }
+  ]
+}

@@ -3,6 +3,7 @@ export interface Comment {
   author: string;
   text: string;
   createdAt: string;
+  postId?: number | string;
 }
 
 export interface Post {
