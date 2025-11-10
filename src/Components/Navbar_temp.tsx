@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { HiSearch, HiX } from 'react-icons/hi';
+import { useNavigate } from 'react-router-dom'; 
 
 interface NavbarProps {
   onGoToMain?: () => void;
@@ -9,6 +10,9 @@ const Navbar: React.FC<NavbarProps> = ({ onGoToMain }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const searchRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate(); 
+
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
 
   const recentSearches = [
     { term: "Arte comic", category: "" },
@@ -42,6 +46,18 @@ const Navbar: React.FC<NavbarProps> = ({ onGoToMain }) => {
     setSearchTerm('');
   };
 
+
+  const goToProfile = () => {
+    if (currentUser?.id) {
+      // Tell the dashboard to switch to the profile page and navigate there
+      window.dispatchEvent(new CustomEvent('dashboard-navigate', { detail: 'profile' }));
+      navigate('/dashboard');
+    } else {
+      alert("Primero inicia sesión para ver tu perfil.");
+      navigate('/login');
+    }
+  };
+
   return (
     <nav className="flex items-center justify-between bg-white p-4 shadow-sm border-b border-gray-200">
       <div 
@@ -51,7 +67,7 @@ const Navbar: React.FC<NavbarProps> = ({ onGoToMain }) => {
         MUSA
       </div>
       
-      {/* Búsqueda */}
+      {}
       <div ref={searchRef} className="relative w-1/2 max-w-md">
         <div className="relative">
           <input
@@ -77,7 +93,7 @@ const Navbar: React.FC<NavbarProps> = ({ onGoToMain }) => {
           )}
         </div>
 
-        {/* Panel de búsqueda */}
+        {}
         {isSearchOpen && (
           <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-xl mt-1 z-50 overflow-hidden">
             <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
@@ -92,7 +108,7 @@ const Navbar: React.FC<NavbarProps> = ({ onGoToMain }) => {
               </div>
             </div>
             
-            {/* Búsquedas recientes */}
+            {}
             <div className="p-4">
               <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
                 <HiSearch className="w-4 h-4 mr-2 text-gray-500" />
@@ -105,7 +121,7 @@ const Navbar: React.FC<NavbarProps> = ({ onGoToMain }) => {
                     onClick={() => handleSearch(search.term)}
                     className="text-left p-3 text-sm text-gray-600 hover:bg-blue-50 hover:text-red-700 rounded-md transition-all duration-200 border border-gray-100 hover:border-red-200 hover:shadow-sm flex items-start"
                   >
-                    <HiSearch className="w-3 h-3 mt-0.5 mr-2 text-gray-400 flex-shrink-0" />
+                    <HiSearch className="w-3 h-3 mt-0.5 mr-2 text-gray-400 shrink-0" />
                     <span>{search.term}</span>
                   </button>
                 ))}
@@ -115,17 +131,14 @@ const Navbar: React.FC<NavbarProps> = ({ onGoToMain }) => {
         )}
       </div>
 
-      {/* Usuario */}
+      {}
       <div className="flex items-center space-x-4">
-        <button className="text-sm text-gray-700">
-        </button>
-        <button className=" text-white px-4 py-2 rounded-lg text-sm">
-        </button>
-        
+        {}
         <img 
           src="https://static.vecteezy.com/system/resources/previews/034/371/675/non_2x/person-silhouette-icon-user-icon-vector.jpg" 
           alt="User" 
-          className="w-8 h-8 rounded-full border border-gray-300" 
+          onClick={goToProfile}
+          className="w-8 h-8 rounded-full border border-gray-300 cursor-pointer hover:scale-110 transition-transform"
         />
       </div>
     </nav>

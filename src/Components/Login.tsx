@@ -43,7 +43,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white-900 to-white-800 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-white-900 to-white-800 flex flex-col items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         <h1 className="text-2xl font-bold text-center text-gray-900 mb-2">
           Accede a tu galería en musa

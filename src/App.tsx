@@ -6,14 +6,15 @@ import Profile from "./Components/Profile";
 import Preferences from "./Components/Preferences";
 import Sidebar from "./Components/Sidebar";
 import Bookmarks from "./Components/Bookmarks";
-import PostDetail from "./pages/PostDetails";
 import './index.css'
 import Login from "./Components/Login";
 import ResetPassword from "./Components/ResetPasword";
 import React from "react";
 import Gallery from "./Components/Gallery/Gallery";
-import Preferencias from "./Components/Preferences";
+// (Preferences imported above)
 import CreateAccount from "./Components/CreateAccount";
+import PostDetails from "./Components/PostDetails";
+import PostDetailPage from "./pages/PostDetailPage";
 
 let currentDashboardPage: "boards" | "profile" | "preferences" | "bookmarks" = "boards";
 
@@ -48,9 +49,7 @@ const Dashboard: React.FC = () => {
         <main className="flex-1 p-6 overflow-y-auto">
           {dashboardPage === "boards" && <Board />}
           {dashboardPage === "profile" && <Profile />}
-          {dashboardPage === "preferences" && <Preferences onContinue={function (): void {
-            throw new Error("Function not implemented.");
-          } } />}
+          {dashboardPage === "preferences" && <Preferences onContinue={() => {}} />}
           {dashboardPage === "bookmarks" && <Bookmarks />}
         </main>
       </div>
@@ -146,7 +145,7 @@ export default function App() {
             path="/preferencias" 
             element={
               <PublicRoute>
-                <Preferencias onContinue={handleLogin} />
+                <Preferences onContinue={handleLogin} />
               </PublicRoute>
             } 
           />
@@ -159,14 +158,26 @@ export default function App() {
               </ProtectedRoute>
             } 
           />
-          <Route 
-            path="/post/:id" 
+          {/* Main gallery post detail (local artworks) */}
+          <Route
+            path="/post/:id"
             element={
               <ProtectedRoute>
-                <PostDetail />
+                <PostDetailPage />
               </ProtectedRoute>
-            } 
+            }
           />
+
+          {/* Profile post detail (json-server posts) */}
+          <Route
+            path="/post/profile/:postId"
+            element={
+              <ProtectedRoute>
+                <PostDetails />
+              </ProtectedRoute>
+            }
+          />
+
           <Route 
             path="/dashboard" 
             element={
@@ -175,6 +186,7 @@ export default function App() {
               </ProtectedRoute>
             } 
           />
+
 
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
