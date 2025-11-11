@@ -13,6 +13,27 @@
       "password": "chancla",
       "birthDate": "2004-02-12",
       "createdAt": "2025-11-08T18:30:09.523Z"
+    },
+    {
+      "id": "d06e",
+      "email": "juana@a",
+      "password": "juana",
+      "birthDate": "3333-03-23",
+      "createdAt": "2025-11-08T18:36:54.137Z"
+    },
+    {
+      "id": "88ae",
+      "email": "scs@w",
+      "password": "sdsd",
+      "birthDate": "21221-02-11",
+      "createdAt": "2025-11-09T18:47:14.540Z"
+    },
+    {
+      "id": "2211",
+      "email": "11@1",
+      "password": "1",
+      "birthDate": "22222-02-22",
+      "createdAt": "2025-11-09T18:49:49.665Z"
     }
   ]
 }
