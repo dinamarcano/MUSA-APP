@@ -1,4 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+interface PreferencesProps {
+  onContinue?: () => void;
+}
 
 const categories = [
   { name: "Pintura", img: "https://upload.wikimedia.org/wikipedia/commons/b/b4/Vincent_Willem_van_Gogh_128.jpg" },
@@ -13,8 +18,9 @@ const categories = [
   { name: "Bauhaus", img: "https://i.pinimg.com/1200x/0f/1a/86/0f1a86e4e6792baf7d8f6544b18a7c21.jpg" },
 ];
 
-export default function Preferences() {
+export default function Preferences({ onContinue }: PreferencesProps) {
   const [selected, setSelected] = useState<string[]>([]);
+  const navigate = useNavigate();
 
   const toggleSelect = (name: string) => {
     setSelected((prev) =>
@@ -22,13 +28,20 @@ export default function Preferences() {
     );
   };
 
+  const handleContinue = () => {
+    // Guardar preferencias (aquí puedes agregar lógica para guardar en tu backend)
+    console.log(`Preferencias seleccionadas: ${selected.join(", ")}`);
+    
+    // Ejecutar el callback de login/continuar
+    onContinue();
+    
+    // Navegar a la main page
+    navigate("/");
+  };
+
   return (
     <section className="flex flex-col items-center justify-center min-h-screen bg-white px-6 py-10">
-      {/* Logo opcional arriba */}
-      <div className="flex items-center justify-center mb-6">
-      <img src="/assets/logo.png" alt="Logo" className="w-20 h-20" />
-      
-      </div>
+      {/* Logo ELIMINADO */}
 
       <h2 className="text-3xl font-bold text-gray-900 mb-2">
         Personaliza tus gustos
@@ -64,7 +77,11 @@ export default function Preferences() {
       {/* Botón continuar */}
       <button
         className="bg-red-700 text-white px-8 py-3 rounded-full mt-10 hover:bg-red-800 transition-colors shadow-lg"
-        onClick={() => alert(`Has seleccionado: ${selected.join(", ")}`)}
+        onClick={() => {
+          const message = `Has seleccionado: ${selected.join(", ")}`;
+          if (onContinue) onContinue();
+          else alert(message);
+        }}
       >
         Continuar
       </button>

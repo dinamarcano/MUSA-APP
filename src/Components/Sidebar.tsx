@@ -2,20 +2,17 @@ import React, { useState } from 'react';
 import { 
   HiHome, 
   HiBell, 
-  HiMail, 
-  HiUser,
   HiChevronLeft,
   HiSearch,
   HiSparkles,
 } from 'react-icons/hi';
 import { 
   RiArtboardFill,
-  RiBookmarkFill,
   RiSettings3Fill
 } from 'react-icons/ri';
 
 interface SidebarProps {
-  setPage?: (page: 'boards' | 'bookmarks' | 'preferences') => void;
+  setPage?: (page: 'boards' | 'preferences') => void;
   onGoToMain?: () => void;
 }
 
@@ -50,11 +47,10 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
     }
   ];
 
-  // MENÚ DE NAVEGACIÓN COMPLETO
+  // Menu items sin "Guardados"
   const menuItems = [
     { icon: HiHome, label: 'Inicio', action: () => onGoToMain?.() },
     { icon: RiArtboardFill, label: 'Tableros', action: () => setPage?.('boards') },
-    { icon: RiBookmarkFill, label: 'Guardados', action: () => setPage?.('bookmarks') },
     { icon: RiSettings3Fill, label: 'Preferencias', action: () => setPage?.('preferences') },
   ];
 
@@ -95,7 +91,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
   return (
     <>
       {/* Sidebar para desktop */}
-      <div className="hidden md:flex w-16 bg-white border-r border-gray-200 text-gray-700 min-h-screen flex-col items-center py-4 relative">
+      <div className="hidden md:flex w-16 bg-white border-r border-gray-200 text-gray-700 min-h-screen flex-col items-center py-4 fixed left-0 top-0 h-full overflow-y-auto">
         
         <div className="space-y-6">
           {menuItems.map((item, index) => {
@@ -122,20 +118,6 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
           >
             <HiBell className="w-6 h-6" />
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
-          </button>
-          
-          <button 
-            className="p-3 hover:bg-blue-50 rounded-xl transition-all duration-200 text-gray-600 hover:text-blue-600"
-            title="Mensajes"
-          >
-            <HiMail className="w-6 h-6" />
-          </button>
-
-          <button 
-            className="p-3 hover:bg-blue-50 rounded-xl transition-all duration-200 text-gray-600 hover:text-blue-600"
-            title="Perfil"
-          >
-            <HiUser className="w-6 h-6" />
           </button>
         </div>
 
@@ -219,6 +201,8 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
         <div className="flex justify-around items-center py-3">
           {menuItems.map((item, index) => {
             const Icon = item.icon;
+            // Cambiar "Tableros" por "Favoritos" solo en móvil
+            const label = item.label === 'Tableros' ? 'Favoritos' : item.label;
             return (
               <button 
                 key={index}
@@ -227,7 +211,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
                 onClick={item.action}
               >
                 <Icon className="w-5 h-5" />
-                <span className="text-xs truncate max-w-[60px]">{item.label}</span>
+                <span className="text-xs truncate max-w-[60px]">{label}</span>
               </button>
             );
           })}
@@ -245,6 +229,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
         </div>
       </div>
 
+      {/* Overlay de notificaciones para móvil */}
       {showNotifications && (
         <div className="md:hidden fixed inset-0 bg-white z-50 overflow-hidden">
           
@@ -285,7 +270,6 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
                 </div>
               </>
             ) : (
-              /* Vista detalle de notificación */
               <div className="space-y-6">
                 {(() => {
                   const details = getNotificationDetails(selectedNotification);
@@ -317,6 +301,9 @@ const Sidebar: React.FC<SidebarProps> = ({ setPage, onGoToMain }) => {
           </div>
         </div>
       )}
+
+      {/* Espacio para el contenido principal cuando sidebar es fija */}
+      <div className="md:ml-16"></div>
     </>
   );
 };

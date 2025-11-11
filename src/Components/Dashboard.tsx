@@ -36,12 +36,10 @@ const Navbar: React.FC<NavbarProps> = ({ setPage }) => {
 
   return (
     <nav className="flex items-center justify-between bg-white p-4 shadow-sm border-b border-gray-200">
-      {/* Solo logo - sin botones de navegación */}
       <div className="flex items-center space-x-6">
         <div className="text-xl font-bold text-gray-900">
           MUSA
         </div>
-        {/* Eliminamos los botones de navegación que duplican las Tabs */}
       </div>
 
       {/* Búsqueda */}

@@ -1,0 +1,36 @@
+{
+  "likes": {
+    "1": {
+      "count": 245,
+      "likedByUser": false
+    },
+    "2": {
+      "count": 189,
+      "likedByUser": false
+    },
+    "3": {
+      "count": 312,
+      "likedByUser": false
+    },
+    "4": {
+      "count": 156,
+      "likedByUser": false
+    },
+    "5": {
+      "count": 278,
+      "likedByUser": false
+    },
+    "6": {
+      "count": 421,
+      "likedByUser": false
+    },
+    "7": {
+      "count": 203,
+      "likedByUser": false
+    },
+    "8": {
+      "count": 334,
+      "likedByUser": false
+    }
+  }
+}

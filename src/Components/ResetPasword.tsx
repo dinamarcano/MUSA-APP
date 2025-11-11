@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const ResetPassword: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -7,11 +8,41 @@ const ResetPassword: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Restableciendo contraseña...');
     
-    navigate('/login');
+    // 1. Validar que las contraseñas coincidan
+    if (newPassword !== confirmPassword) {
+      alert('Las contraseñas no coinciden');
+      return;
+    }
+
+    try {
+      // 2. Obtener usuarios de la API
+      const response = await axios.get('http://localhost:3001/users');
+      const users = response.data;
+
+      // 3. Buscar usuario por email
+      const userIndex = users.findIndex((user: any) => user.email === email);
+      
+      if (userIndex === -1) {
+        alert('No existe una cuenta con este email');
+        return;
+      }
+
+      // 4. Actualizar contraseña del usuario
+      const updatedUser = { ...users[userIndex], password: newPassword };
+      await axios.put(`http://localhost:3001/users/${users[userIndex].id}`, updatedUser);
+
+      console.log('Contraseña actualizada exitosamente');
+      alert('Contraseña restablecida correctamente');
+      
+      navigate('/login');
+      
+    } catch (error) {
+      console.error('Error restableciendo contraseña:', error);
+      alert('Error al restablecer la contraseña');
+    }
   };
 
   return (
@@ -30,6 +61,7 @@ const ResetPassword: React.FC = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+              placeholder="Ingresa tu correo electrónico"
               required
             />
           </div>
@@ -44,6 +76,7 @@ const ResetPassword: React.FC = () => {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+              placeholder="Ingresa tu nueva contraseña"
               required
             />
           </div>
@@ -58,6 +91,7 @@ const ResetPassword: React.FC = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+              placeholder="Confirma tu nueva contraseña"
               required
             />
           </div>
