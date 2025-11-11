@@ -33,7 +33,7 @@ export default function Preferences({ onContinue }: PreferencesProps) {
     console.log(`Preferencias seleccionadas: ${selected.join(", ")}`);
     
     // Ejecutar el callback de login/continuar
-    onContinue();
+    onContinue?.()
     
     // Navegar a la main page
     navigate("/");
@@ -77,11 +77,7 @@ export default function Preferences({ onContinue }: PreferencesProps) {
       {/* Botón continuar */}
       <button
         className="bg-red-700 text-white px-8 py-3 rounded-full mt-10 hover:bg-red-800 transition-colors shadow-lg"
-        onClick={() => {
-          const message = `Has seleccionado: ${selected.join(", ")}`;
-          if (onContinue) onContinue();
-          else alert(message);
-        }}
+        onClick={handleContinue}
       >
         Continuar
       </button>
