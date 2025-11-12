@@ -2,7 +2,7 @@ import axios from "axios";
 import type { Comment } from "../types/posts";
 
 const BASE_URL =
-  import.meta.env.VITE_JSON_SERVER_URL ?? "http://localhost:3000";
+  import.meta.env.VITE_JSON_SERVER_URL ?? "http://localhost:3001";
 
 const COMMENTS_ENDPOINT = `${BASE_URL}/comments`;
 

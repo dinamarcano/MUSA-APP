@@ -63,13 +63,18 @@ const PostDetailPage: React.FC = () => {
   };
 
   const handleAddComment = async (postId: number, text: string) => {
-    try {
-      const newComment = await addCommentApi(postId, { author: "Usuario", text });
-      setComments(prev => [...prev, newComment]);
-    } catch (error) {
-      console.error('Error al agregar comentario:', error);
-      alert("Error al agregar el comentario. Por favor, intenta de nuevo.");
-    }
+  const storedUser = localStorage.getItem("currentUser");
+      const currentUser = storedUser ? JSON.parse(storedUser) : null;
+      const displayName =
+        currentUser?.username ||
+        currentUser?.name ||
+        currentUser?.email ||
+        "Invitado";
+
+      const newComment = await addCommentApi(postId, {
+        author: displayName,
+        text,
+      });
   };
 
   if (loading) return <div className="flex items-center justify-center min-h-screen"><div className="text-gray-600">Cargando...</div></div>;
