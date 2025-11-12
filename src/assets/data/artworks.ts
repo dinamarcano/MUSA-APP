@@ -6,7 +6,7 @@ export interface Artwork {
   // Los comentarios se cargan dinámicamente desde comments.json usando axios
   // Este campo se mantiene para compatibilidad con el tipo Post
   comments?: {
-    id: number;
+    id: number | string;
     author: string;
     text: string;
     createdAt: string;

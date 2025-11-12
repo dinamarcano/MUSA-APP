@@ -104,25 +104,11 @@
       "createdAt": "2025-11-10T14:39:14.130Z"
     },
     {
-      "id": "6ae4",
-      "postId": 1,
-      "author": "Usuario",
-      "text": "vasvv",
-      "createdAt": "2025-11-12T13:40:55.781Z"
-    },
-    {
-      "id": "04ba",
-      "postId": 1,
+      "id": "d8b1",
+      "postId": 2,
       "author": "sofiamejianieto2006@gmail.com",
-      "text": "csavsav",
-      "createdAt": "2025-11-12T13:43:48.795Z"
-    },
-    {
-      "id": "2fc2",
-      "postId": 1,
-      "author": "sofiamejianieto2006@gmail.com",
-      "text": "fqwfqwfw",
-      "createdAt": "2025-11-12T13:43:55.541Z"
+      "text": "HOLA",
+      "createdAt": "2025-11-12T14:03:35.712Z"
     }
   ],
   "likes": [
@@ -149,6 +135,34 @@
       "postId": 1,
       "count": 1,
       "likedByUser": true
+    }
+  ],
+  "posts": [
+    {
+      "id": "f7ab",
+      "userId": "9fb8",
+      "image": "https://www.google.com/url?sa=i&url=https%3A%2F%2Fes.wikipedia.org%2Fwiki%2FFelis_catus&psig=AOvVaw3yx8jc5Fuz-0SsC5_JDOeP&ust=1763041667342000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCNDg6ZXg7JADFQAAAAAdAAAAABAH",
+      "title": "l",
+      "description": "l",
+      "tags": [
+        "arte"
+      ],
+      "createdAt": "2025-11-12T14:58:53.994Z",
+      "likes": 0,
+      "comments": []
+    },
+    {
+      "id": "1438",
+      "userId": "9fb8",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRiYA2wHlFbsKoWsC6IsMdl0aSOCn2s5pcDr1DexyZt80TtHSQtPOAcMXKixHOj84yu-8JMRHFNmt18fRZZkALoGYjuG_6Pwawg0BpPZms&s=10",
+      "title": "gbsgbd",
+      "description": "bsdbshadzbhah",
+      "tags": [
+        "arte"
+      ],
+      "createdAt": "2025-11-12T14:59:58.454Z",
+      "likes": 0,
+      "comments": []
     }
   ]
 }

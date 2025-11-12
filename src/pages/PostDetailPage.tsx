@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { HiHeart, HiArrowLeft, HiChatAlt } from 'react-icons/hi';
 import { artworks } from '../assets/data/artworks';
-import { getCommentsByPostId, addComment as addCommentApi, initializeComments } from '../utils/commentsApi';
+import { getCommentsByPostId, addComment as addCommentApi, initializeComments, deleteComment as deleteCommentApi } from '../utils/commentsApi';
 import { getLikesByPostId, toggleLike as toggleLikeApi, initializeLikes } from '../utils/likesApi';
 import type { Comment } from '../types/posts';
 import Comments from '../Components/Comments';
@@ -60,7 +60,16 @@ const PostDetailPage: React.FC = () => {
       console.error('Error al alternar like:', error);
       alert("Error al actualizar el like. Por favor, intenta de nuevo.");
     }
+  };const handleDeleteComment = async (_postId: number, commentId: number) => {
+    try {
+      await deleteCommentApi(commentId);
+      setComments((prev) => prev.filter((comment) => comment.id !== commentId));
+    } catch (error) {
+      console.error('Error al eliminar comentario:', error);
+      alert("No se pudo eliminar el comentario. Intenta nuevamente.");
+    }
   };
+
 
   const handleAddComment = async (postId: number, text: string) => {
   const storedUser = localStorage.getItem("currentUser");
@@ -136,18 +145,43 @@ const PostDetailPage: React.FC = () => {
                 </button>
               </div>
 
-              {showComments && <div className="mt-6"><Comments post={post} onAddComment={handleAddComment} /></div>}
+              {showComments && (
+                <div className="mt-6">
+                  <Comments
+                    post={post}
+                    onAddComment={handleAddComment}
+                    onDeleteComment={handleDeleteComment}
+                  />
+                </div>
+              )}
 
               {!showComments && comments.length > 0 && (
                 <div className="mt-6">
                   <h3 className="font-semibold text-gray-800 mb-4">Comentarios ({comments.length})</h3>
                   <div className="space-y-3 max-h-60 overflow-y-auto">
-                    {comments.slice(0, 3).map((comment) => (
-                      <div key={comment.id} className="bg-gray-50 p-4 rounded-lg">
-                        <p className="font-medium text-gray-800 text-sm mb-1">{comment.author}</p>
-                        <p className="text-gray-600">{comment.text}</p>
-                      </div>
-                    ))}
+                   {comments.slice(0, 3).map((comment) => {
+                      const date = comment.createdAt ? new Date(comment.createdAt) : null;
+                      const formattedTime =
+                        date && !Number.isNaN(date.getTime())
+                          ? date.toLocaleString("es-ES", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              day: "2-digit",
+                              month: "short",
+                            })
+                          : null;
+                      return (
+                        <div key={comment.id} className="bg-gray-50 p-4 rounded-lg">
+                          <div className="flex items-center justify-between mb-1">
+                            <p className="font-medium text-gray-800 text-sm">{comment.author}</p>
+                            {formattedTime && (
+                              <p className="text-xs text-gray-500">{formattedTime}</p>
+                            )}
+                          </div>
+                          <p className="text-gray-600">{comment.text}</p>
+                        </div>
+                      );
+                    })}
                     {comments.length > 3 && <button onClick={() => setShowComments(true)} className="text-blue-600 text-sm hover:underline">Ver todos los comentarios ({comments.length})</button>}
                   </div>
                 </div>

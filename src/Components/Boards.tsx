@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { artworks as initialArtworks } from "../assets/data/artworks";
 import Comments from "./Comments";
-import type { Post } from "../types/posts";
+import type { Post, Comment } from "../types/posts";
 import {
   getAllComments,
   addComment as addCommentApi,
+  deleteComment as deleteCommentApi,
   initializeComments,
 } from "../utils/commentsApi";
 import {
@@ -13,14 +14,20 @@ import {
   initializeLikes,
 } from "../utils/likesApi";
 
+type ArtworkState = (typeof initialArtworks)[number] & {
+  comments: Comment[];
+  likes: number;
+  likedByMe: boolean;
+};
+
 export default function Board() {
-  const [artworks, setArtworks] = useState(
+  const [artworks, setArtworks] = useState<ArtworkState[]>(
     initialArtworks.map((a) => ({
       ...a,
       comments: [], // Se cargarán desde comments.json
       likes: 0,
       likedByMe: false,
-    }))
+    })) as ArtworkState[]
   );
 
   const [openComments, setOpenComments] = useState<number | null>(null);
@@ -47,7 +54,7 @@ export default function Board() {
               comments: allComments[postIdStr] || [],
               likes: likeData?.count || 0,
               likedByMe: likeData?.likedByUser || false,
-            };
+            } as ArtworkState;
           })
         );
       } catch (error) {
@@ -58,12 +65,28 @@ export default function Board() {
     loadData();
   }, []);
 
+  const getCurrentDisplayName = () => {
+    const storedUser = localStorage.getItem("currentUser");
+    if (!storedUser) return "Invitado";
+    try {
+      const currentUser = JSON.parse(storedUser);
+      return (
+        currentUser?.username ||
+        currentUser?.name ||
+        currentUser?.email ||
+        "Invitado"
+      );
+    } catch {
+      return "Invitado";
+    }
+  };
+
   // 💬 Agregar comentario usando axios
   const handleAddComment = async (artworkId: number, text: string) => {
     try {
       // Agregar comentario usando la API
       const newComment = await addCommentApi(artworkId, {
-        author: "Usuario",
+        author: getCurrentDisplayName(),
         text,
       });
 
@@ -71,16 +94,38 @@ export default function Board() {
       setArtworks((prev) =>
         prev.map((a) =>
           a.id === artworkId
-            ? {
+            ? ({
                 ...a,
                 comments: [...a.comments, newComment],
-              }
+              } as ArtworkState)
             : a
         )
       );
     } catch (error) {
       console.error("Error al agregar comentario:", error);
       alert("Error al agregar el comentario. Por favor, intenta de nuevo.");
+    }
+  };
+
+  const handleDeleteComment = async (
+    artworkId: number,
+    commentId: number | string
+  ) => {
+    try {
+      await deleteCommentApi(commentId);
+      setArtworks((prev) =>
+        prev.map((a) =>
+          a.id === artworkId
+            ? ({
+                ...a,
+                comments: a.comments.filter((c) => c.id !== commentId),
+              } as ArtworkState)
+            : a
+        )
+      );
+    } catch (error) {
+      console.error("Error al eliminar comentario:", error);
+      alert("No se pudo eliminar el comentario. Intenta nuevamente.");
     }
   };
 
@@ -175,7 +220,11 @@ export default function Board() {
 
                 {/* Caja de comentarios */}
                 {openComments === a.id && (
-                  <Comments post={post} onAddComment={handleAddComment} />
+                  <Comments
+                    post={post}
+                    onAddComment={handleAddComment}
+                    onDeleteComment={handleDeleteComment}
+                  />
                 )}
               </div>
             </article>

@@ -16,6 +16,22 @@ const PostsList: React.FC = () => {
     setPosts(getPosts());
   }, []);
 
+  const getCurrentDisplayName = () => {
+    const storedUser = localStorage.getItem("currentUser");
+    if (!storedUser) return "Invitado";
+    try {
+      const currentUser = JSON.parse(storedUser);
+      return (
+        currentUser?.username ||
+        currentUser?.name ||
+        currentUser?.email ||
+        "Invitado"
+      );
+    } catch {
+      return "Invitado";
+    }
+  };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -37,7 +53,7 @@ const PostsList: React.FC = () => {
   };
 
   // 💬 Nueva función para manejar comentarios
-  const handleAddComment = (postId: number, text: string) => {
+  const handleAddComment = async (postId: number, text: string) => {
     const updatedPosts = posts.map((p) =>
       p.id === postId
         ? {
@@ -46,7 +62,7 @@ const PostsList: React.FC = () => {
               ...p.comments,
               {
                 id: Date.now(),
-                author: "Usuario",
+                author: getCurrentDisplayName(),
                 text,
                 createdAt: new Date().toISOString(),
               },
@@ -58,6 +74,23 @@ const PostsList: React.FC = () => {
     setPosts(updatedPosts);
 
     // ✅ Guardar el cambio en localStorage
+    const updated = updatedPosts.find((p) => p.id === postId);
+    if (updated) await updatePost(updated);
+  };
+
+  const handleDeleteComment = async (
+    postId: number,
+    commentId: number | string
+  ) => {
+    const updatedPosts = posts.map((p) =>
+      p.id === postId
+        ? {
+            ...p,
+            comments: p.comments.filter((c) => c.id !== commentId),
+          }
+        : p
+    );
+    setPosts(updatedPosts);
     const updated = updatedPosts.find((p) => p.id === postId);
     if (updated) updatePost(updated);
   };
@@ -120,7 +153,11 @@ const PostsList: React.FC = () => {
             </div>
 
             {/* ✅ Ahora Comments usa onAddComment */}
-            <Comments post={p} onAddComment={handleAddComment} />
+            <Comments
+              post={p}
+              onAddComment={handleAddComment}
+              onDeleteComment={handleDeleteComment}
+            />
           </article>
         ))}
       </div>
