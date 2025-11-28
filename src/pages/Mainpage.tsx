@@ -1,7 +1,7 @@
 import React from "react";
 import Sidebar from "../Components/Sidebar";
 import Navbar from "../Components/Navbar_temp";
-import Gallery from "../Components/Gallery/Gallery";
+import Gallery from "../Components/Gallery/GlobalGallery";
 
 const MainPage: React.FC = () => {
   return (

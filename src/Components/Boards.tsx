@@ -1,236 +1,208 @@
-import { useState, useEffect } from "react";
-import { artworks as initialArtworks } from "../assets/data/artworks";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../AuthContext";
 import Comments from "./Comments";
-import type { Post, Comment } from "../types/posts";
+import { getPosts, type UiPost } from "../utils/supabasePosts";
 import {
   getAllComments,
   addComment as addCommentApi,
   deleteComment as deleteCommentApi,
-  initializeComments,
-} from "../utils/commentsApi";
-import {
-  getAllLikes,
-  toggleLike as toggleLikeApi,
-  initializeLikes,
-} from "../utils/likesApi";
+} from "../utils/supabaseComments";
+import { toggleLike, getAllLikes } from "../utils/supabaseLikes";
 
-type ArtworkState = (typeof initialArtworks)[number] & {
-  comments: Comment[];
-  likes: number;
-  likedByMe: boolean;
-};
+type PostForUI = UiPost;
 
 export default function Board() {
-  const [artworks, setArtworks] = useState<ArtworkState[]>(
-    initialArtworks.map((a) => ({
-      ...a,
-      comments: [], // Se cargarán desde comments.json
-      likes: 0,
-      likedByMe: false,
-    })) as ArtworkState[]
-  );
+  const navigate = useNavigate();
+  const { user: authUser } = useAuth();
 
-  const [openComments, setOpenComments] = useState<number | null>(null);
+  const [posts, setPosts] = useState<PostForUI[]>([]);
+  const [openComments, setOpenComments] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [liking, setLiking] = useState<Set<string>>(new Set());
 
-  // Inicializar comentarios y likes al cargar el componente
+  const handleLike = async (postId: string) => {
+    if (!authUser) return alert("Inicia sesión para dar like.");
+    if (liking.has(postId)) return;              // guard
+    setLiking(prev => new Set(prev).add(postId));
+
+    let prevLiked = false, prevCount = 0;
+    // Optimista
+    setPosts(prev => prev.map(p => {
+      if (p.id !== postId) return p;
+      prevLiked = !!p.likedByMe; prevCount = p.likes ?? 0;
+      const nextLiked = !prevLiked;
+      const nextCount = Math.max(prevCount + (nextLiked ? 1 : -1), 0);
+      return { ...p, likedByMe: nextLiked, likes: nextCount };
+    }));
+
+    try {
+      console.debug("before", { prevLiked, prevCount });
+      const updated = await toggleLike(postId, authUser.id);
+      console.debug("after", updated);
+      setPosts(prev => prev.map(p => p.id === postId
+        ? { ...p, likes: updated.count, likedByMe: updated.likedByUser }
+        : p));
+    } catch (e) {
+      // Revertir si backend falló (síntoma de RLS/trigger)
+      setPosts(prev => prev.map(p => p.id === postId
+        ? { ...p, likedByMe: prevLiked, likes: prevCount }
+        : p));
+    } finally {
+      setLiking(prev => { const s = new Set(prev); s.delete(postId); return s; });
+    }
+  };
+
+
   useEffect(() => {
-    const loadData = async () => {
+    const load = async () => {
       try {
-        // Inicializar comentarios y likes desde el JSON
-        await initializeComments();
-        await initializeLikes();
-        
-        // Cargar todos los comentarios y likes
-        const allComments = await getAllComments();
-        const allLikes = await getAllLikes();
-        
-        // Actualizar artworks con los comentarios y likes cargados
-        setArtworks((prev) =>
-          prev.map((a) => {
-            const postIdStr = a.id.toString();
-            const likeData = allLikes[postIdStr];
-            return {
-              ...a,
-              comments: allComments[postIdStr] || [],
-              likes: likeData?.count || 0,
-              likedByMe: likeData?.likedByUser || false,
-            } as ArtworkState;
-          })
-        );
-      } catch (error) {
-        console.error("Error al cargar datos:", error);
+        const feed = await getPosts();                       // posts de Supabase
+        const byPost = await getAllComments();               // comentarios agrupados
+        const likesMap = await getAllLikes(authUser?.id);    // { postId: {count, likedByUser} }
+
+        const merged = feed.map((p) => {
+          const like = likesMap[p.id] ?? { count: 0, likedByUser: false };
+          return {
+            ...p,
+            likes: like.count,
+            likedByMe: like.likedByUser,
+            comments: byPost[p.id] ?? [],
+          };
+        });
+
+        setPosts(merged);
+      } catch (e) {
+        console.error("Error cargando feed", e);
+      } finally {
+        setLoading(false);
       }
     };
+    load();
+  }, [authUser?.id]);
 
-    loadData();
-  }, []);
+  const displayName = () => authUser?.email ?? "Usuario";
 
-  const getCurrentDisplayName = () => {
-    const storedUser = localStorage.getItem("currentUser");
-    if (!storedUser) return "Invitado";
-    try {
-      const currentUser = JSON.parse(storedUser);
-      return (
-        currentUser?.username ||
-        currentUser?.name ||
-        currentUser?.email ||
-        "Invitado"
-      );
-    } catch {
-      return "Invitado";
+  const handleAddComment = async (postId: string, text: string) => {
+    if (!authUser) {
+      alert("Inicia sesión para comentar.");
+      return;
     }
-  };
-
-  // 💬 Agregar comentario usando axios
-  const handleAddComment = async (artworkId: number, text: string) => {
     try {
-      // Agregar comentario usando la API
-      const newComment = await addCommentApi(artworkId, {
-        author: getCurrentDisplayName(),
-        text,
-      });
-
-      // Actualizar el estado local
-      setArtworks((prev) =>
-        prev.map((a) =>
-          a.id === artworkId
-            ? ({
-                ...a,
-                comments: [...a.comments, newComment],
-              } as ArtworkState)
-            : a
+      const newComment = await addCommentApi(postId, authUser.id, displayName(), text);
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === postId ? { ...p, comments: [...p.comments, newComment] } : p
         )
       );
-    } catch (error) {
-      console.error("Error al agregar comentario:", error);
-      alert("Error al agregar el comentario. Por favor, intenta de nuevo.");
+    } catch (e) {
+      console.error("Error al agregar comentario", e);
+      alert("No se pudo agregar el comentario.");
     }
   };
 
-  const handleDeleteComment = async (
-    artworkId: number,
-    commentId: number | string
-  ) => {
+  const handleDeleteComment = async (postId: string, commentId: string | number) => {
     try {
       await deleteCommentApi(commentId);
-      setArtworks((prev) =>
-        prev.map((a) =>
-          a.id === artworkId
-            ? ({
-                ...a,
-                comments: a.comments.filter((c) => c.id !== commentId),
-              } as ArtworkState)
-            : a
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === postId
+            ? { ...p, comments: p.comments.filter((c: any) => String(c.id) !== String(commentId)) }
+            : p
         )
       );
-    } catch (error) {
-      console.error("Error al eliminar comentario:", error);
-      alert("No se pudo eliminar el comentario. Intenta nuevamente.");
+    } catch (e) {
+      console.error("Error al eliminar comentario", e);
+      alert("No se pudo eliminar el comentario.");
     }
   };
 
-  // ❤️ Likes usando la API
-  const handleLike = async (id: number) => {
-    try {
-      // Alternar like usando la API
-      const newLikeState = await toggleLikeApi(id);
-
-      // Actualizar el estado local
-      setArtworks((prev) =>
-        prev.map((a) =>
-          a.id === id
-            ? {
-                ...a,
-                likedByMe: newLikeState.likedByUser,
-                likes: newLikeState.count,
-              }
-            : a
-        )
-      );
-    } catch (error) {
-      console.error("Error al alternar like:", error);
-      alert("Error al actualizar el like. Por favor, intenta de nuevo.");
-    }
+  const toDetail = (postId: string) => {
+    navigate(`/post/profile/${postId}`);
   };
+
+  if (loading) {
+    return (
+      <section className="max-w-7xl mx-auto p-4">
+        <h2 className="text-2xl font-bold mb-8">Mis obras</h2>
+        <div>Cargando...</div>
+      </section>
+    );
+  }
 
   return (
     <section className="max-w-7xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-8">Mis obras favoritas</h2>
+      <h2 className="text-2xl font-bold mb-8">Mis obras</h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {artworks.map((a) => {
-          // 👇 Declaramos explícitamente el tipo Post
-          const post: Post = {
-            id: a.id,
-            image: a.image,
-            title: a.title,
-            description: "",
-            author: a.artist,
-            likes: a.likes,
-            likedByMe: a.likedByMe,
-            comments: a.comments,
-          };
+      {posts.length === 0 ? (
+        <div className="text-gray-600">Aún no hay publicaciones.</div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {posts.map((p) => {
+            // Adaptación mínima al tipo esperado por Comments
+            const postForComments = {
+              id: p.id,
+              image: p.image,
+              title: p.title ?? "",
+              description: p.description ?? "",
+              author: "", // si necesitas, consulta profiles
+              likes: p.likes,
+              likedByMe: !!p.likedByMe,
+              comments: p.comments,
+            };
 
-          return (
-            <article
-              key={a.id}
-              className="relative bg-white rounded-2xl shadow-lg p-4 overflow-hidden"
-            >
-              {/* Imagen principal (no bloquea clics) */}
-              <img
-                src={a.image}
-                alt={a.title}
-                className="w-full h-72 object-cover rounded-2xl hover:scale-105 transition-transform duration-300 pointer-events-none"
-              />
+            return (
+              <article
+                key={p.id}
+                className="relative bg-white rounded-2xl shadow-lg p-4 overflow-hidden group"
+              >
+                <img
+                  src={p.image}
+                  alt={p.title || `post-${p.id}`}
+                  className="w-full h-72 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-300 cursor-pointer"
+                  onClick={() => toDetail(p.id)}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src =
+                      "https://via.placeholder.com/600x400/4F46E5/FFFFFF?text=Imagen+no+disponible";
+                  }}
+                />
 
-              {/* Capa hover visual (no intercepta clics) */}
-              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
-                <button className="bg-white text-gray-800 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors pointer-events-auto">
-                  Ver detalles
-                </button>
-              </div>
+                <div className="mt-3 relative z-10">
+                  <h3 className="text-lg font-semibold">{p.title || "Sin título"}</h3>
+                  {p.description && (
+                    <p className="text-gray-600 text-sm mb-2">{p.description}</p>
+                  )}
 
-              {/* Info de la obra */}
-              <div className="mt-3 relative z-10">
-                <h3 className="text-lg font-semibold">{a.title}</h3>
-                <p className="text-gray-600 text-sm mb-2">{a.artist}</p>
+                  <div className="flex items-center gap-3 mb-2">
+                    <button
+                      onClick={() => handleLike(p.id)}
+                      className={`z-10 relative flex items-center gap-1 px-3 py-1 rounded text-sm font-medium ${p.likedByMe ? "bg-red-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                    >
+                      {p.likedByMe ? "❤️" : "🤍"} {p.likes}
+                    </button>
 
-                {/* Botones de interacción */}
-                <div className="flex items-center gap-3 mb-2">
-                  <button
-                    onClick={() => handleLike(a.id)}
-                    className={`z-10 relative flex items-center gap-1 px-3 py-1 rounded text-sm font-medium ${
-                      a.likedByMe
-                        ? "bg-red-500 text-white"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                  >
-                    {a.likedByMe ? "❤️" : "🤍"} {a.likes}
-                  </button>
+                    <button
+                      onClick={() => setOpenComments(openComments === p.id ? null : p.id)}
+                      className="z-10 relative flex items-center gap-1 px-3 py-1 rounded text-sm bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    >
+                      💬 Comentar
+                    </button>
+                  </div>
 
-                  <button
-                    onClick={() =>
-                      setOpenComments(openComments === a.id ? null : a.id)
-                    }
-                    className="z-10 relative flex items-center gap-1 px-3 py-1 rounded text-sm bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  >
-                    💬 Comentar
-                  </button>
+                  {openComments === p.id && (
+                    <Comments
+                      post={postForComments as any}
+                      onAddComment={(id, text) => handleAddComment(String(id), text)}
+                      onDeleteComment={(id, cId) => handleDeleteComment(String(id), cId)}
+                    />
+                  )}
                 </div>
-
-                {/* Caja de comentarios */}
-                {openComments === a.id && (
-                  <Comments
-                    post={post}
-                    onAddComment={handleAddComment}
-                    onDeleteComment={handleDeleteComment}
-                  />
-                )}
-              </div>
-            </article>
-          );
-        })}
-      </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 }

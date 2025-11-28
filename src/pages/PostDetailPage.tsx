@@ -1,197 +1,394 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { HiHeart, HiArrowLeft, HiChatAlt } from 'react-icons/hi';
-import { artworks } from '../assets/data/artworks';
-import { getCommentsByPostId, addComment as addCommentApi, initializeComments, deleteComment as deleteCommentApi } from '../utils/commentsApi';
-import { getLikesByPostId, toggleLike as toggleLikeApi, initializeLikes } from '../utils/likesApi';
-import type { Comment } from '../types/posts';
-import Comments from '../Components/Comments';
-import type { Post } from '../types/posts';
+// PostDetails.tsx (versión usando Supabase)
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import supabase  from "../supabaseClient";      // ajusta la ruta si es necesario
+import { useAuth } from "../AuthContext";          // ajusta la ruta si es necesario
+
+interface CommentItem {
+  id: string;
+  author: string;
+  text: string;
+  createdAt: string;
+}
+
+interface Post {
+  id: string;
+  userId: string;
+  image: string;
+  title?: string;
+  description?: string;
+  tags?: string[];
+  filename?: string;
+  createdAt?: string;
+  likes?: number;
+  comments?: CommentItem[];
+}
+
+interface User {
+  id: string;
+  name?: string;
+  username?: string;
+  avatar?: string;
+  email?: string;
+}
 
 const PostDetailPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const [artwork, setArtwork] = useState(artworks.find(a => a.id.toString() === id));
-  const [comments, setComments] = useState<Comment[]>([]);
+  const params = useParams();
+  const routeId =
+    (params as any).postId ??
+    (params as any).id ??
+    (params as any).post ??
+    (params as any).artId ??
+    null;
+
+  const { user: authUser } = useAuth();
+
+  const [post, setPost] = useState<Post | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [commentText, setCommentText] = useState("");
   const [loading, setLoading] = useState(true);
-  const [showComments, setShowComments] = useState(false);
-  const [liked, setLiked] = useState(false);
-  const [likesCount, setLikesCount] = useState(0);
+
+  // Mapeo de fila de Supabase a la forma que espera la UI actual
+  const mapPostRowToPost = (row: any): Post => ({
+    id: row.id,
+    userId: row.user_id,
+    image: row.image_url,
+    title: row.title ?? "",
+    description: row.description ?? "",
+    tags: row.tags ?? [],
+    createdAt: row.created_at,
+    likes: row.likes_count ?? 0,
+    comments: [],
+  });
+
+  const mapCommentRowToComment = (row: any): CommentItem => ({
+    id: row.id,
+    author: row.author_name ?? "Usuario",
+    text: row.text,
+    createdAt: row.created_at,
+  });
 
   useEffect(() => {
     const loadPostData = async () => {
+      setLoading(true);
+
+      if (!routeId) {
+        console.warn(
+          "No se recibió id de ruta (routeId es null). Revisa la ruta en App.tsx"
+        );
+        setLoading(false);
+        return;
+      }
+
       try {
-        await initializeComments();
-        await initializeLikes();
-        const foundArtwork = artworks.find(a => a.id.toString() === id);
-        if (!foundArtwork) {
-          console.error('Artwork no encontrado');
+        // 1. Obtener el post desde Supabase
+        const { data: postRow, error: postError } = await supabase
+          .from("posts")
+          .select("*")
+          .eq("id", routeId)
+          .single();
+
+        if (postError || !postRow) {
+          console.warn("Publicación no encontrada con ID:", routeId, postError);
+          setPost(null);
+          setLoading(false);
           return;
         }
-        setArtwork(foundArtwork);
-        const likeData = await getLikesByPostId(id || '');
-        setLikesCount(likeData.count);
-        setLiked(likeData.likedByUser);
-        const postComments = await getCommentsByPostId(id || '');
-        setComments(postComments);
-      } catch (error) {
-        console.error('Error al cargar datos del post:', error);
+
+        const mappedPost = mapPostRowToPost(postRow);
+        setPost(mappedPost);
+
+        // 2. Obtener el usuario/autor del post desde profiles
+        if (postRow.user_id) {
+          const { data: profile, error: profileError } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", postRow.user_id)
+            .maybeSingle();
+
+          if (!profileError && profile) {
+            setUser({
+              id: profile.id,
+              name: profile.name ?? undefined,
+              username: profile.username ?? undefined,
+              avatar: profile.avatar ?? undefined,
+              email: profile.email ?? undefined,
+            });
+          } else {
+            setUser(null);
+          }
+        }
+
+        // 3. Obtener comentarios del post
+        const { data: commentRows, error: commentsError } = await supabase
+          .from("comments")
+          .select("*")
+          .eq("post_id", postRow.id)
+          .order("created_at", { ascending: true });
+
+        if (!commentsError && commentRows) {
+          const mappedComments = commentRows.map(mapCommentRowToComment);
+          setPost((prev) =>
+            prev ? { ...prev, comments: mappedComments } : prev
+          );
+        }
+      } catch (err) {
+        console.error("Error fetching post desde Supabase:", err);
+        setPost(null);
       } finally {
         setLoading(false);
       }
     };
 
-    if (id) loadPostData();
-  }, [id]);
+    loadPostData();
+  }, [routeId]);
 
-  const handleBack = () => navigate(-1);
+  const handleAddComment = async () => {
+    if (!commentText.trim() || !post || !authUser) return;
 
-  const handleAuthorClick = () => {
-    if (artwork) navigate(`/profile/${artwork.artist}`);
+    try {
+      const authorLabel =
+        user?.username || user?.name || authUser.email || "Usuario actual";
+
+      const { data, error } = await supabase
+        .from("comments")
+        .insert({
+          post_id: post.id,
+          user_id: authUser.id,
+          author_name: authorLabel,
+          text: commentText.trim(),
+        })
+        .select()
+        .single();
+
+      if (error || !data) throw error;
+
+      const newComment = mapCommentRowToComment(data);
+
+      setPost((prev) =>
+        prev
+          ? { ...prev, comments: [...(prev.comments || []), newComment] }
+          : prev
+      );
+      setCommentText("");
+    } catch (err) {
+      console.error("Error adding comment:", err);
+      alert("No se pudo guardar el comentario. Revisa Supabase.");
+    }
   };
 
   const handleLike = async () => {
+    if (!post || !authUser) return;
+
     try {
-      if (!id) return;
-      const newLikeState = await toggleLikeApi(id);
-      setLiked(newLikeState.likedByUser);
-      setLikesCount(newLikeState.count);
-    } catch (error) {
-      console.error('Error al alternar like:', error);
-      alert("Error al actualizar el like. Por favor, intenta de nuevo.");
+      // Ver si el usuario ya ha dado like
+      const { data: existing, error: likeError } = await supabase
+        .from("post_likes")
+        .select("id")
+        .eq("post_id", post.id)
+        .eq("user_id", authUser.id)
+        .maybeSingle();
+
+      if (likeError && likeError.code !== "PGRST116") {
+        throw likeError;
+      }
+
+      if (existing) {
+        // Ya había like -> quitar
+        await supabase.from("post_likes").delete().eq("id", existing.id);
+      } else {
+        // No había like -> agregar
+        await supabase
+          .from("post_likes")
+          .insert({ post_id: post.id, user_id: authUser.id });
+      }
+
+      // Leer likes_count actualizado (idealmente mantenido por trigger)
+      const { data: postRow, error: postError } = await supabase
+        .from("posts")
+        .select("likes_count")
+        .eq("id", post.id)
+        .single();
+
+      if (postError || !postRow) throw postError;
+
+      setPost((prev) =>
+        prev ? { ...prev, likes: postRow.likes_count ?? 0 } : prev
+      );
+    } catch (err) {
+      console.error("Error liking post:", err);
+      alert("No se pudo registrar el like. Revisa Supabase.");
     }
-  };const handleDeleteComment = async (_postId: number, commentId: number) => {
-    try {
-      await deleteCommentApi(commentId);
-      setComments((prev) => prev.filter((comment) => comment.id !== commentId));
-    } catch (error) {
-      console.error('Error al eliminar comentario:', error);
-      alert("No se pudo eliminar el comentario. Intenta nuevamente.");
-    }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-600">Cargando publicación...</p>
+      </div>
+    );
+  }
 
-  const handleAddComment = async (postId: number, text: string) => {
-  const storedUser = localStorage.getItem("currentUser");
-      const currentUser = storedUser ? JSON.parse(storedUser) : null;
-      const displayName =
-        currentUser?.username ||
-        currentUser?.name ||
-        currentUser?.email ||
-        "Invitado";
+  if (!post) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-600">Publicación no encontrada</p>
+      </div>
+    );
+  }
 
-      const newComment = await addCommentApi(postId, {
-        author: displayName,
-        text,
-      });
-  };
-
-  if (loading) return <div className="flex items-center justify-center min-h-screen"><div className="text-gray-600">Cargando...</div></div>;
-  if (!artwork) return <div className="flex items-center justify-center min-h-screen"><div className="text-gray-600">Publicación no encontrada</div></div>;
-
-  const post: Post = {
-    id: artwork.id,
-    image: artwork.image,
-    title: artwork.title,
-    description: "",
-    author: artwork.artist,
-    likes: likesCount,
-    likedByMe: liked,
-    comments,
-  };
+  const authorLabel =
+    user?.name || user?.username || user?.email || "Usuario Anónimo";
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white shadow-sm">
-        <div className="flex items-center justify-between p-4">
-          <button onClick={handleBack} className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors">
-            <HiArrowLeft className="w-6 h-6" />
-            <span className="font-medium">Atrás</span>
-          </button>
-          <div className="text-xl font-bold text-gray-900">MUSA</div>
-          <div className="w-6"></div>
-        </div>
-      </header>
-
-      <main className="flex flex-1">
-        <aside className="w-16 bg-white border-r border-gray-200 hidden md:block" />
-        <section className="flex-1 max-w-4xl mx-auto p-4 md:p-8">
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-            <div className="relative">
-              <img src={artwork.image} alt={artwork.title} className="w-full h-96 object-cover" />
-            </div>
-            <div className="p-6">
-              <div className="flex items-center space-x-3 mb-4 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors" onClick={handleAuthorClick}>
-                <img src="https://static.vecteezy.com/system/resources/previews/034/371/675/non_2x/person-silhouette-icon-user-icon-vector.jpg" alt={artwork.artist} className="w-10 h-10 rounded-full border border-gray-300" />
-                <div><h3 className="font-semibold text-gray-800">{artwork.artist}</h3><p className="text-sm text-gray-500">Artista</p></div>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        {/* Cabecera autor */}
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center space-x-3">
+            {user?.avatar ? (
+              <img
+                src={user.avatar}
+                alt={authorLabel}
+                className="w-12 h-12 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center text-white font-bold">
+                {String(authorLabel).charAt(0).toUpperCase()}
               </div>
-              <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">{artwork.title}</h1>
-                <p className="text-gray-600">Obra de arte destacada</p>
-              </div>
-              <div className="flex items-center space-x-6 border-t border-b border-gray-200 py-4 mb-6">
-                <div className="flex items-center space-x-2 text-gray-700"><HiHeart className="w-5 h-5 text-red-500" /><span className="font-medium">{likesCount} me gusta</span></div>
-                <div className="flex items-center space-x-2 text-gray-700"><HiChatAlt className="w-5 h-5 text-blue-500" /><span className="font-medium">{comments.length} comentarios</span></div>
-              </div>
-              <div className="flex space-x-4">
-                <button onClick={handleLike} className={`flex items-center space-x-2 px-6 py-2 rounded-lg transition-colors ${liked ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
-                  <HiHeart className="w-5 h-5" />
-                  <span>{liked ? 'Te gusta' : 'Me gusta'}</span>
-                </button>
-                <button onClick={() => setShowComments(!showComments)} className="flex items-center space-x-2 border border-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors">
-                  <HiChatAlt className="w-5 h-5" />
-                  <span>Comentar</span>
-                </button>
-              </div>
-
-              {showComments && (
-                <div className="mt-6">
-                  <Comments
-                    post={post}
-                    onAddComment={handleAddComment}
-                    onDeleteComment={handleDeleteComment}
-                  />
-                </div>
+            )}
+            <div>
+              <h3 className="font-semibold text-gray-800">{authorLabel}</h3>
+              {post.createdAt && (
+                <p className="text-sm text-gray-500">
+                  {new Date(post.createdAt).toLocaleDateString("es-ES", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </p>
               )}
+            </div>
+          </div>
+        </div>
 
-              {!showComments && comments.length > 0 && (
-                <div className="mt-6">
-                  <h3 className="font-semibold text-gray-800 mb-4">Comentarios ({comments.length})</h3>
-                  <div className="space-y-3 max-h-60 overflow-y-auto">
-                   {comments.slice(0, 3).map((comment) => {
-                      const date = comment.createdAt ? new Date(comment.createdAt) : null;
-                      const formattedTime =
-                        date && !Number.isNaN(date.getTime())
-                          ? date.toLocaleString("es-ES", {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                              day: "2-digit",
-                              month: "short",
-                            })
-                          : null;
-                      return (
-                        <div key={comment.id} className="bg-gray-50 p-4 rounded-lg">
-                          <div className="flex items-center justify-between mb-1">
-                            <p className="font-medium text-gray-800 text-sm">{comment.author}</p>
-                            {formattedTime && (
-                              <p className="text-xs text-gray-500">{formattedTime}</p>
-                            )}
-                          </div>
-                          <p className="text-gray-600">{comment.text}</p>
-                        </div>
-                      );
-                    })}
-                    {comments.length > 3 && <button onClick={() => setShowComments(true)} className="text-blue-600 text-sm hover:underline">Ver todos los comentarios ({comments.length})</button>}
+        {/* Contenido principal */}
+        <div className="p-6">
+          {post.title && (
+            <h1 className="text-3xl font-bold text-gray-800 mb-4">
+              {post.title}
+            </h1>
+          )}
+
+          <div className="mb-6 rounded-lg overflow-hidden">
+            <img
+              src={post.image}
+              alt={post.title || "Publicación"}
+              className="w-full h-auto max-h-96 object-cover"
+              onError={(e) => {
+                e.currentTarget.src =
+                  "https://via.placeholder.com/800x400/4F46E5/FFFFFF?text=Imagen+no+disponible";
+              }}
+            />
+          </div>
+
+          {post.description && (
+            <div className="mb-6">
+              <p className="text-gray-700 leading-relaxed">
+                {post.description}
+              </p>
+            </div>
+          )}
+
+          {post.tags && post.tags.length > 0 && (
+            <div className="mb-6">
+              <div className="flex flex-wrap gap-2">
+                {post.tags.map((tag, i) => (
+                  <span
+                    key={i}
+                    className="px-3 py-1 bg-red-100 text-red-800 text-sm font-medium rounded-full"
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Likes y contador de comentarios */}
+          <div className="flex items-center justify-between border-t border-b border-gray-200 py-4 mb-6">
+            <div className="flex items-center space-x-6">
+              <button
+                onClick={handleLike}
+                className="flex items-center space-x-2 text-gray-600 hover:text-red-600 transition-colors"
+                disabled={!authUser}
+              >
+                <span className="text-2xl">❤️</span>
+                <span>{post.likes || 0} me gusta</span>
+              </button>
+              <div className="flex items-center space-x-2 text-gray-600">
+                <span className="text-2xl">💬</span>
+                <span>{(post.comments || []).length} comentarios</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Comentarios */}
+          <div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">
+              Comentarios ({(post.comments || []).length})
+            </h3>
+
+            {/* Caja para añadir comentario */}
+            {authUser && (
+              <div className="mb-6">
+                <textarea
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  placeholder="Añade un comentario..."
+                  className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+                  rows={3}
+                />
+                <div className="flex justify-end mt-2">
+                  <button
+                    onClick={handleAddComment}
+                    disabled={!commentText.trim()}
+                    className="px-6 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Comentar
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Lista de comentarios */}
+            <div className="space-y-4">
+              {(post.comments || []).map((comment) => (
+                <div
+                  key={String(comment.id)}
+                  className="border-b border-gray-100 pb-4 last:border-b-0"
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="font-semibold text-gray-800">
+                      {comment.author}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      {new Date(comment.createdAt).toLocaleDateString("es-ES")}
+                    </span>
                   </div>
+                  <p className="text-gray-700">{comment.text}</p>
+                </div>
+              ))}
+
+              {(post.comments || []).length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  <p>No hay comentarios aún. ¡Sé el primero en comentar!</p>
                 </div>
               )}
             </div>
           </div>
-        </section>
-      </main>
-
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40" />
+        </div>
+      </div>
     </div>
   );
 };

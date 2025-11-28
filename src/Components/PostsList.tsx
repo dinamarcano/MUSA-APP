@@ -1,99 +1,63 @@
 import React, { useEffect, useState } from "react";
-import { getPosts, createPost, toggleLike, updatePost } from "../utils/api";
-import type { Post } from "../types/posts";
-import Comments from "./Comments";
+import { getPosts, createPost, toggleLike, type UiPost } from "../utils/supabasePosts";
 
 const PostsList: React.FC = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<UiPost[]>([]);
   const [form, setForm] = useState({
     title: "",
     image: "",
     description: "",
-    author: "",
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setPosts(getPosts());
+    const load = async () => {
+      try {
+        const data = await getPosts();
+        setPosts(data);
+      } catch (e) {
+        console.error("Error cargando feed", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
   }, []);
-
-  const getCurrentDisplayName = () => {
-    const storedUser = localStorage.getItem("currentUser");
-    if (!storedUser) return "Invitado";
-    try {
-      const currentUser = JSON.parse(storedUser);
-      return (
-        currentUser?.username ||
-        currentUser?.name ||
-        currentUser?.email ||
-        "Invitado"
-      );
-    } catch {
-      return "Invitado";
-    }
-  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  ) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.title || !form.image)
-      return alert("Completa al menos título e imagen.");
-    const newPost = await createPost(form);
-    setPosts([newPost, ...posts]);
-    setForm({ title: "", image: "", description: "", author: "" });
+    if (!form.title || !form.image) return alert("Completa al menos título e imagen.");
+    try {
+      const created = await createPost({
+        image: form.image,
+        title: form.title,
+        description: form.description,
+      });
+      setPosts((prev) => [created, ...prev]);
+      setForm({ title: "", image: "", description: "" });
+    } catch (err) {
+      console.error("Error creando post", err);
+      alert("No se pudo crear el post.");
+    }
   };
 
-  const handleLike = async (post: Post) => {
-    const updated = await toggleLike(post);
-    setPosts(posts.map((p) => (p.id === post.id ? updated : p)));
+  const handleLike = async (post: UiPost) => {
+    try {
+      const updated = await toggleLike(post);
+      setPosts((prev) => prev.map((p) => (p.id === post.id ? updated : p)));
+    } catch (err) {
+      console.error("Error alternando like", err);
+      alert("No se pudo actualizar el like.");
+    }
   };
 
-  // 💬 Nueva función para manejar comentarios
-  const handleAddComment = async (postId: number, text: string) => {
-    const updatedPosts = posts.map((p) =>
-      p.id === postId
-        ? {
-            ...p,
-            comments: [
-              ...p.comments,
-              {
-                id: Date.now(),
-                author: getCurrentDisplayName(),
-                text,
-                createdAt: new Date().toISOString(),
-              },
-            ],
-          }
-        : p
-    );
-
-    setPosts(updatedPosts);
-
-    // ✅ Guardar el cambio en localStorage
-    const updated = updatedPosts.find((p) => p.id === postId);
-    if (updated) await updatePost(updated);
-  };
-
-  const handleDeleteComment = async (
-    postId: number,
-    commentId: number | string
-  ) => {
-    const updatedPosts = posts.map((p) =>
-      p.id === postId
-        ? {
-            ...p,
-            comments: p.comments.filter((c) => c.id !== commentId),
-          }
-        : p
-    );
-    setPosts(updatedPosts);
-    const updated = updatedPosts.find((p) => p.id === postId);
-    if (updated) updatePost(updated);
-  };
+  if (loading) {
+    return <div className="p-4">Cargando feed...</div>;
+  }
 
   return (
     <div className="p-4">
@@ -115,13 +79,6 @@ const PostsList: React.FC = () => {
           onChange={handleChange}
           className="w-full border rounded p-2 mb-2"
         />
-        <input
-          name="author"
-          placeholder="Autor"
-          value={form.author}
-          onChange={handleChange}
-          className="w-full border rounded p-2 mb-2"
-        />
         <textarea
           name="description"
           placeholder="Descripción"
@@ -134,7 +91,6 @@ const PostsList: React.FC = () => {
         </button>
       </form>
 
-      {/* Lista de publicaciones */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {posts.map((p) => (
           <article key={p.id} className="bg-white rounded shadow p-3">
@@ -142,24 +98,25 @@ const PostsList: React.FC = () => {
               src={p.image}
               alt={p.title}
               className="rounded w-full h-56 object-cover"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src =
+                  "https://via.placeholder.com/600x400/4F46E5/FFFFFF?text=Imagen+no+disponible";
+              }}
             />
             <h3 className="text-lg font-semibold mt-2">{p.title}</h3>
-            <p className="text-sm text-gray-600">{p.description}</p>
-
+            {p.description && (
+              <p className="text-sm text-gray-600">{p.description}</p>
+            )}
             <div className="flex items-center gap-3 mt-2">
               <button onClick={() => handleLike(p)}>
                 {p.likedByMe ? "💖" : "🤍"} {p.likes}
               </button>
             </div>
-
-            {/* ✅ Ahora Comments usa onAddComment */}
-            <Comments
-              post={p}
-              onAddComment={handleAddComment}
-              onDeleteComment={handleDeleteComment}
-            />
           </article>
         ))}
+        {posts.length === 0 && (
+          <div className="text-gray-600">Aún no hay publicaciones.</div>
+        )}
       </div>
     </div>
   );

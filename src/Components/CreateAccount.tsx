@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import supabase from '../supabaseClient';
 
 interface CreateAccountProps {
   onContinue: () => void;
@@ -14,31 +14,33 @@ const CreateAccount: React.FC<CreateAccountProps> = ({ onContinue }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    try {
-      // 1. Crear objeto con datos del usuario
-      const userData = {
-        email,
-        password,
-        birthDate,
-        createdAt: new Date().toISOString()
-      };
 
-      // 2. Guardar en JSON Server (API falsa)
-      const response = await axios.post('http://localhost:3001/users', userData);
-      
-      console.log('Usuario creado en API:', response.data);
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          birth_date: birthDate,
+        },
+      },
+    });
 
-      // 3. También guardar en LocalStorage por compatibilidad
-      localStorage.setItem('userData', JSON.stringify(userData));
-
-      onContinue();
-      navigate('/preferencias');
-      
-    } catch (error) {
-      console.error('Error creando usuario:', error);
-      alert('Error al crear la cuenta. Intenta nuevamente.');
+    if (signUpError) {
+      console.error("Error creando usuario", signUpError);
+      alert(signUpError.message);  // mostrará "Email address \"...\" is invalid"
+      return;
     }
+
+    await supabase.from('profiles').insert({
+      id: data.user?.id,
+      email: email,
+      name: '',
+      username: '',
+      birth_date: birthDate,
+    });
+
+    onContinue();
+    navigate('/preferencias');
   };
 
   return (
@@ -109,16 +111,16 @@ const CreateAccount: React.FC<CreateAccountProps> = ({ onContinue }) => {
             >
               Continuar
             </button>
-            
+
             <div className="flex justify-between text-sm">
-              <Link 
-                to="/reset-password" 
+              <Link
+                to="/reset-password"
                 className="text-black-600 hover:text-red-800 transition duration-200"
               >
                 ¿Olvidaste tu contraseña?
               </Link>
-              <Link 
-                to="/login" 
+              <Link
+                to="/login"
                 className="text-black-600 hover:text-red-800 transition duration-200"
               >
                 ¿Ya tienes cuenta?
